@@ -44,7 +44,18 @@ export default function Home() {
 
   const handleNewMatch = () => {
     if (lastPlayers && selectedSport && selectedFormat) {
-      createMatch(selectedSport, lastPlayers.p1, lastPlayers.p2, selectedFormat);
+      const newMatch = createMatch(selectedSport, lastPlayers.p1, lastPlayers.p2, selectedFormat);
+      // Save match ID for display mode
+      if (newMatch) {
+        localStorage.setItem('currentMatchId', newMatch.id);
+      }
+    }
+  };
+
+  const openDisplayMode = () => {
+    if (match?.id) {
+      const displayUrl = `${window.location.origin}/display?matchId=${match.id}`;
+      window.open(displayUrl, 'display', 'width=1024,height=768');
     }
   };
 
@@ -82,6 +93,7 @@ export default function Home() {
       onReset={handleReset}
       onNewMatch={handleNewMatch}
       onBackToMenu={handleBackToMenu}
+      onOpenDisplay={openDisplayMode}
     />
   );
 }

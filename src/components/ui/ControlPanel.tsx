@@ -8,9 +8,10 @@ interface ControlPanelProps {
   canUndo: boolean;
   gameOver?: boolean;
   onSwap?: () => void;
+  onOpenDisplay?: () => void;
 }
 
-export function ControlPanel({ onReset, onUndo, canUndo, gameOver = false, onSwap }: ControlPanelProps) {
+export function ControlPanel({ onReset, onUndo, canUndo, gameOver = false, onSwap, onOpenDisplay }: ControlPanelProps) {
   const [showConfirmReset, setShowConfirmReset] = useState(false);
 
   const handleReset = () => {
@@ -49,6 +50,15 @@ export function ControlPanel({ onReset, onUndo, canUndo, gameOver = false, onSwa
             className="rounded bg-purple-600 px-4 py-3 font-semibold text-white transition-all active:scale-95 hover:bg-purple-700 text-sm"
           >
             ↔️ Intercambiar
+          </button>
+        )}
+
+        {!gameOver && onOpenDisplay && (
+          <button
+            onClick={onOpenDisplay}
+            className="rounded bg-orange-600 px-4 py-3 font-semibold text-white transition-all active:scale-95 hover:bg-orange-700 text-sm"
+          >
+            📺 Pantalla
           </button>
         )}
 

@@ -1,11 +1,12 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { ScoreDisplay } from '@/components/ui/ScoreDisplay';
 import { ControlPanel } from '@/components/ui/ControlPanel';
 import { ResultScreen } from './ResultScreen';
 import { useTactile } from '@/lib/hooks/useTactile';
 import { useSwipeDetection } from '@/lib/hooks/useSwipeDetection';
+import { useRealtimeMatch } from '@/lib/hooks/useRealtimeMatch';
 import type { Match } from '@/types';
 
 interface ScoreboardActiveProps {
@@ -16,14 +17,21 @@ interface ScoreboardActiveProps {
   onNewMatch?: () => void;
   onBackToMenu?: () => void;
   onSwapPlayers?: () => void;
+  onOpenDisplay?: () => void;
 }
 
-export function ScoreboardActive({ match, onAddPoint, onUndo, onReset, onNewMatch, onBackToMenu, onSwapPlayers }: ScoreboardActiveProps) {
+export function ScoreboardActive({ match, onAddPoint, onUndo, onReset, onNewMatch, onBackToMenu, onSwapPlayers, onOpenDisplay }: ScoreboardActiveProps) {
   // Show result screen if game is over
   if (match.result && onNewMatch && onBackToMenu) {
     return <ResultScreen match={match} onNewMatch={onNewMatch} onBackToMenu={onBackToMenu} />;
   }
   const { pointFeedback } = useTactile();
+  const { updateMatch } = useRealtimeMatch(match.id);
+
+  // Sync match to Supabase whenever it changes
+  useEffect(() => {
+    updateMatch(match);
+  }, [match, updateMatch]);
 
   const handleTapP1 = () => {
     pointFeedback();
@@ -107,6 +115,7 @@ export function ScoreboardActive({ match, onAddPoint, onUndo, onReset, onNewMatc
         canUndo={match.history.length > 0}
         gameOver={!!match.result}
         onSwap={onSwapPlayers}
+        onOpenDisplay={onOpenDisplay}
       />
     </>
   );
