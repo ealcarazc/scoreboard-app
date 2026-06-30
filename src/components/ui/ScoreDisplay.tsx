@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 
 interface ScoreDisplayProps {
   p1Name: string;
@@ -31,12 +31,29 @@ export function ScoreDisplay({
   onTapP1,
   onTapP2,
 }: ScoreDisplayProps) {
+  const [flashP1, setFlashP1] = useState(false);
+  const [flashP2, setFlashP2] = useState(false);
+
+  const handleP1Click = () => {
+    setFlashP1(true);
+    setTimeout(() => setFlashP1(false), 150);
+    onTapP1();
+  };
+
+  const handleP2Click = () => {
+    setFlashP2(true);
+    setTimeout(() => setFlashP2(false), 150);
+    onTapP2();
+  };
+
   return (
     <div className="flex h-screen w-screen select-none overflow-hidden bg-black">
       {/* Player 1 - Left Side */}
       <button
-        onClick={onTapP1}
-        className="flex w-1/2 flex-col items-center justify-center gap-2 transition-opacity active:opacity-80"
+        onClick={handleP1Click}
+        className={`flex w-1/2 flex-col items-center justify-center gap-2 transition-all active:opacity-80 ${
+          flashP1 ? 'brightness-150' : ''
+        }`}
         style={{ backgroundColor: p1Color }}
       >
         <div className="text-center">
@@ -52,8 +69,10 @@ export function ScoreDisplay({
 
       {/* Player 2 - Right Side */}
       <button
-        onClick={onTapP2}
-        className="flex w-1/2 flex-col items-center justify-center gap-2 transition-opacity active:opacity-80"
+        onClick={handleP2Click}
+        className={`flex w-1/2 flex-col items-center justify-center gap-2 transition-all active:opacity-80 ${
+          flashP2 ? 'brightness-150' : ''
+        }`}
         style={{ backgroundColor: p2Color }}
       >
         <div className="text-center">
