@@ -1,17 +1,8 @@
 [build]
   command = "npm run build"
-  publish = ".next/static"
-  functions = "netlify/functions"
-
-[functions]
-  node_bundler = "esbuild"
+  publish = ".next"
 
 [[redirects]]
   from = "/*"
-  to = "/index.html"
-  status = 200
-
-[[redirects]]
-  from = "/_next/static/*"
-  to = "/_next/static/:splat"
+  to = "/"
   status = 200
