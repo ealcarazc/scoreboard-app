@@ -26,8 +26,8 @@ export function DisplayMode({ matchId }: DisplayModeProps) {
           id: data.id,
           sport: data.sport,
           players: {
-            p1: { name: data.player1_name, color: data.player1_color, id: 'p1' },
-            p2: { name: data.player2_name, color: data.player2_color, id: 'p2' },
+            p1: { name: data.player1_name, color: data.player1_color, id: 'p1', isFrequent: false },
+            p2: { name: data.player2_name, color: data.player2_color, id: 'p2', isFrequent: false },
           },
           format: data.format,
           currentPoints: { p1: data.current_points_p1, p2: data.current_points_p2 },
@@ -64,8 +64,8 @@ export function DisplayMode({ matchId }: DisplayModeProps) {
               id: data.id,
               sport: data.sport,
               players: {
-                p1: { name: data.player1_name, color: data.player1_color, id: 'p1' },
-                p2: { name: data.player2_name, color: data.player2_color, id: 'p2' },
+                p1: { name: data.player1_name, color: data.player1_color, id: 'p1', isFrequent: false },
+                p2: { name: data.player2_name, color: data.player2_color, id: 'p2', isFrequent: false },
               },
               format: data.format,
               currentPoints: { p1: data.current_points_p1, p2: data.current_points_p2 },
