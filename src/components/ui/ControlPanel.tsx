@@ -28,6 +28,7 @@ export function ControlPanel({ onReset, onUndo, canUndo, gameOver = false, onSwa
       <div className="flex justify-center gap-4 flex-wrap">
         <button
           onClick={onUndo}
+          onTouchEnd={onUndo}
           disabled={!canUndo}
           className="rounded bg-blue-600 px-6 py-3 font-semibold text-white transition-all active:scale-95 disabled:bg-gray-500 disabled:cursor-not-allowed"
         >
@@ -36,6 +37,7 @@ export function ControlPanel({ onReset, onUndo, canUndo, gameOver = false, onSwa
 
         <button
           onClick={handleReset}
+          onTouchEnd={handleReset}
           className={`rounded px-6 py-3 font-semibold text-white transition-all active:scale-95 ${
             showConfirmReset ? 'bg-red-700' : 'bg-gray-700 hover:bg-gray-600'
           }`}
@@ -46,6 +48,7 @@ export function ControlPanel({ onReset, onUndo, canUndo, gameOver = false, onSwa
         {!gameOver && onSwap && (
           <button
             onClick={onSwap}
+            onTouchEnd={onSwap}
             className="rounded bg-purple-600 px-4 py-3 font-semibold text-white transition-all active:scale-95 hover:bg-purple-700 text-sm"
           >
             ↔️ Intercambiar
@@ -55,6 +58,7 @@ export function ControlPanel({ onReset, onUndo, canUndo, gameOver = false, onSwa
         {gameOver && (
           <button
             onClick={onReset}
+            onTouchEnd={onReset}
             className="rounded bg-green-600 px-6 py-3 font-semibold text-white transition-all active:scale-95 hover:bg-green-700"
           >
             ✓ Nuevo Juego

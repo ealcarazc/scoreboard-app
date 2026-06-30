@@ -92,6 +92,7 @@ export function PlayerSelector({ onSelectPlayers }: PlayerSelectorProps) {
             <button
               key={player.id}
               onClick={() => onSelectPlayer(player)}
+              onTouchEnd={() => onSelectPlayer(player)}
               className={`block w-full rounded px-4 py-2 text-left transition-all ${
                 selectedPlayer?.id === player.id
                   ? isP1
@@ -150,6 +151,7 @@ export function PlayerSelector({ onSelectPlayers }: PlayerSelectorProps) {
             <button
               key={color}
               onClick={() => onColorChange(idx)}
+              onTouchEnd={() => onColorChange(idx)}
               className={`h-10 rounded transition-all cursor-pointer ${
                 colorIdx === idx ? 'ring-2 ring-white' : 'ring-1 ring-gray-600'
               }`}
@@ -193,6 +195,7 @@ export function PlayerSelector({ onSelectPlayers }: PlayerSelectorProps) {
 
       <button
         onClick={handleStartMatch}
+        onTouchEnd={handleStartMatch}
         disabled={!p1 || !p2 || p1.id === p2.id}
         className="mt-auto rounded-lg bg-green-600 px-6 py-4 text-xl font-bold text-white transition-all active:scale-95 disabled:bg-gray-500 disabled:cursor-not-allowed"
       >

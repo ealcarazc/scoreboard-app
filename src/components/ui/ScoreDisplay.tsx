@@ -36,6 +36,7 @@ export function ScoreDisplay({
       {/* Player 1 - Left Side */}
       <button
         onClick={onTapP1}
+        onTouchEnd={onTapP1}
         className="flex w-1/2 flex-col items-center justify-center gap-2 transition-opacity active:opacity-80"
         style={{ backgroundColor: p1Color }}
       >
@@ -53,6 +54,7 @@ export function ScoreDisplay({
       {/* Player 2 - Right Side */}
       <button
         onClick={onTapP2}
+        onTouchEnd={onTapP2}
         className="flex w-1/2 flex-col items-center justify-center gap-2 transition-opacity active:opacity-80"
         style={{ backgroundColor: p2Color }}
       >
