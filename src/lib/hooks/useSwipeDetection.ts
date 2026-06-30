@@ -10,15 +10,21 @@ interface SwipeCallbacks {
 export function useSwipeDetection(callbacks: SwipeCallbacks, enabled: boolean = true) {
   const touchStartX = useRef<number>(0);
   const touchStartY = useRef<number>(0);
+  const touchStartTime = useRef<number>(0);
 
   const handleTouchStart = (e: TouchEvent) => {
     if (!enabled) return;
     touchStartX.current = e.touches[0].clientX;
     touchStartY.current = e.touches[0].clientY;
+    touchStartTime.current = Date.now();
   };
 
   const handleTouchEnd = (e: TouchEvent) => {
     if (!enabled) return;
+
+    // Ignore if touch duration is too short (likely a tap/click, not a swipe)
+    const touchDuration = Date.now() - touchStartTime.current;
+    if (touchDuration < 100) return;
 
     const touchEndX = e.changedTouches[0].clientX;
     const touchEndY = e.changedTouches[0].clientY;
@@ -30,9 +36,10 @@ export function useSwipeDetection(callbacks: SwipeCallbacks, enabled: boolean = 
     if (Math.abs(deltaX) < Math.abs(deltaY)) return;
 
     // Minimum swipe distance
-    const minSwipeDistance = 50;
+    const minSwipeDistance = 80;
     if (Math.abs(deltaX) < minSwipeDistance) return;
 
+    // Only trigger swipe if it's a genuine swipe gesture
     if (deltaX > 0 && callbacks.onSwipeRight) {
       callbacks.onSwipeRight();
     } else if (deltaX < 0 && callbacks.onSwipeLeft) {
@@ -43,12 +50,15 @@ export function useSwipeDetection(callbacks: SwipeCallbacks, enabled: boolean = 
   useEffect(() => {
     if (!enabled) return;
 
-    document.addEventListener('touchstart', handleTouchStart, false);
-    document.addEventListener('touchend', handleTouchEnd, false);
+    // Use passive listeners to not block touch events
+    const options = { passive: true };
+
+    document.addEventListener('touchstart', handleTouchStart as any, options);
+    document.addEventListener('touchend', handleTouchEnd as any, options);
 
     return () => {
-      document.removeEventListener('touchstart', handleTouchStart, false);
-      document.removeEventListener('touchend', handleTouchEnd, false);
+      document.removeEventListener('touchstart', handleTouchStart as any);
+      document.removeEventListener('touchend', handleTouchEnd as any);
     };
   }, [enabled, callbacks]);
 }
