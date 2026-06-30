@@ -35,3 +35,6 @@ Abierto en `http://localhost:3000`
 - [ ] Historial de partidos
 - [ ] Sincronización Supabase (phone ↔ iPad)
 - [ ] Pantalla de estadísticas
+
+---
+Last updated: 2026-06-30 14:27 UTC
