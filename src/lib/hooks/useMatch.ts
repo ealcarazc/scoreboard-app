@@ -4,6 +4,8 @@ import { useState, useCallback } from 'react';
 import type { Match, PlayerInfo, Sport } from '@/types';
 import { addPointPingPong, resetPingPongGame, undoPointPingPong, initPingPongGame } from '@/game/engines/pingpong';
 import { nanoid } from 'nanoid';
+import { addPointSquash, resetSquashGame, undoPointSquash, initSquashGame } from '@/game/engines/squash';
+import { addPointTennis, resetTennisGame, undoPointTennis, initTennisGame } from '@/game/engines/tennis';
 
 export function useMatch() {
   const [match, setMatch] = useState<Match | null>(null);
@@ -35,17 +37,39 @@ export function useMatch() {
     (player: 'p1' | 'p2') => {
       if (!match) return;
 
-      const gameState = initPingPongGame(match.format as any, match.currentServer);
-      gameState.currentPoints = { ...match.currentPoints };
-      gameState.pointTarget = match.format === '11-points' ? 11 : 21;
+      let newGameState: any;
 
-      const newGameState = addPointPingPong(gameState, player);
+      if (match.sport === 'pingpong') {
+        const gameState = initPingPongGame(match.format as any, match.currentServer);
+        gameState.currentPoints = { ...match.currentPoints };
+        gameState.pointTarget = match.format === '11-points' ? 11 : 21;
+        newGameState = addPointPingPong(gameState, player);
+      } else if (match.sport === 'squash') {
+        const gameState = initSquashGame(match.currentServer);
+        gameState.currentPoints = { ...match.currentPoints };
+        newGameState = addPointSquash(gameState, player);
+      } else if (match.sport === 'tennis') {
+        const gameState = initTennisGame(match.format as any, match.currentServer);
+        gameState.currentPoints = { ...match.currentPoints };
+        gameState.currentGames = { ...match.currentGames };
+        gameState.currentSets = { ...match.currentSets };
+        gameState.isInTiebreak = match.isInTiebreak;
+        newGameState = addPointTennis(gameState, player);
+      }
 
       const pointRecord = {
         timestamp: new Date(),
         scorerPlayerId: player,
         gameStateBefore: { ...match, history: [] },
-        gameStateAfter: { ...match, currentPoints: newGameState.currentPoints, currentServer: newGameState.currentServer, history: [] },
+        gameStateAfter: {
+          ...match,
+          currentPoints: newGameState.currentPoints,
+          currentGames: newGameState.currentGames || match.currentGames,
+          currentSets: newGameState.currentSets || match.currentSets,
+          currentServer: newGameState.currentServer,
+          isInTiebreak: newGameState.isInTiebreak || match.isInTiebreak,
+          history: [],
+        },
       };
 
       setMatch((prev) => {
@@ -53,7 +77,10 @@ export function useMatch() {
         return {
           ...prev,
           currentPoints: newGameState.currentPoints,
+          currentGames: newGameState.currentGames || prev.currentGames,
+          currentSets: newGameState.currentSets || prev.currentSets,
           currentServer: newGameState.currentServer,
+          isInTiebreak: newGameState.isInTiebreak || prev.isInTiebreak,
           result: newGameState.winner ? (newGameState.winner === 'p1' ? 'p1_win' : 'p2_win') : undefined,
           endTime: newGameState.isGameOver ? new Date() : undefined,
           history: [...prev.history, pointRecord],
