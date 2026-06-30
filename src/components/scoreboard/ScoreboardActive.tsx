@@ -3,6 +3,7 @@
 import React from 'react';
 import { ScoreDisplay } from '@/components/ui/ScoreDisplay';
 import { ControlPanel } from '@/components/ui/ControlPanel';
+import { ResultScreen } from './ResultScreen';
 import { useTactile } from '@/lib/hooks/useTactile';
 import { useSwipeDetection } from '@/lib/hooks/useSwipeDetection';
 import type { Match } from '@/types';
@@ -12,10 +13,16 @@ interface ScoreboardActiveProps {
   onAddPoint: (player: 'p1' | 'p2') => void;
   onUndo: () => void;
   onReset: () => void;
+  onNewMatch?: () => void;
+  onBackToMenu?: () => void;
   onSwapPlayers?: () => void;
 }
 
-export function ScoreboardActive({ match, onAddPoint, onUndo, onReset, onSwapPlayers }: ScoreboardActiveProps) {
+export function ScoreboardActive({ match, onAddPoint, onUndo, onReset, onNewMatch, onBackToMenu, onSwapPlayers }: ScoreboardActiveProps) {
+  // Show result screen if game is over
+  if (match.result && onNewMatch && onBackToMenu) {
+    return <ResultScreen match={match} onNewMatch={onNewMatch} onBackToMenu={onBackToMenu} />;
+  }
   const { pointFeedback } = useTactile();
 
   const handleTapP1 = () => {
@@ -28,11 +35,11 @@ export function ScoreboardActive({ match, onAddPoint, onUndo, onReset, onSwapPla
     onAddPoint('p2');
   };
 
-  // Swipe detection
+  // Swipe detection - disabled when game is over
   useSwipeDetection(
     {
-      onSwipeLeft: onUndo,
-      onSwipeRight: onUndo,
+      onSwipeLeft: match.result ? undefined : onUndo,
+      onSwipeRight: match.result ? undefined : onUndo,
     },
     !match.result
   );
