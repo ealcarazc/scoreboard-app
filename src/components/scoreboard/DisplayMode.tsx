@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase/client';
-import type { Match } from '@/types';
+import type { Match, PlayerInfo } from '@/types';
 
 interface DisplayModeProps {
   matchId: string;
@@ -13,7 +13,6 @@ export function DisplayMode({ matchId }: DisplayModeProps) {
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
-    // Initial fetch
     const fetchMatch = async () => {
       const { data, error } = await supabase
         .from('matches')
@@ -22,13 +21,24 @@ export function DisplayMode({ matchId }: DisplayModeProps) {
         .single();
 
       if (data && !error) {
+        const p1: PlayerInfo = {
+          id: 'p1',
+          name: data.player1_name,
+          color: data.player1_color,
+          isFrequent: false,
+        };
+
+        const p2: PlayerInfo = {
+          id: 'p2',
+          name: data.player2_name,
+          color: data.player2_color,
+          isFrequent: false,
+        };
+
         const matchData: Match = {
           id: data.id,
           sport: data.sport,
-          players: {
-            p1: { name: data.player1_name, color: data.player1_color, id: 'p1', isFrequent: false },
-            p2: { name: data.player2_name, color: data.player2_color, id: 'p2', isFrequent: false },
-          },
+          players: { p1, p2 },
           format: data.format,
           currentSet: 1,
           currentPoints: { p1: data.current_points_p1, p2: data.current_points_p2 },
@@ -47,7 +57,6 @@ export function DisplayMode({ matchId }: DisplayModeProps) {
 
     fetchMatch();
 
-    // Subscribe to realtime updates
     const channel = supabase
       .channel(`match:${matchId}`)
       .on(
@@ -61,13 +70,25 @@ export function DisplayMode({ matchId }: DisplayModeProps) {
         (payload) => {
           if (payload.new) {
             const data = payload.new as any;
+
+            const p1: PlayerInfo = {
+              id: 'p1',
+              name: data.player1_name,
+              color: data.player1_color,
+              isFrequent: false,
+            };
+
+            const p2: PlayerInfo = {
+              id: 'p2',
+              name: data.player2_name,
+              color: data.player2_color,
+              isFrequent: false,
+            };
+
             const matchData: Match = {
               id: data.id,
               sport: data.sport,
-              players: {
-                p1: { name: data.player1_name, color: data.player1_color, id: 'p1', isFrequent: false },
-                p2: { name: data.player2_name, color: data.player2_color, id: 'p2', isFrequent: false },
-              },
+              players: { p1, p2 },
               format: data.format,
               currentSet: 1,
               currentPoints: { p1: data.current_points_p1, p2: data.current_points_p2 },
@@ -140,16 +161,11 @@ export function DisplayMode({ matchId }: DisplayModeProps) {
 
   return (
     <div className="flex h-screen w-screen select-none overflow-hidden bg-black">
-      {/* Status indicator */}
       <div className={`absolute top-4 right-4 text-sm px-3 py-1 rounded z-10 ${isConnected ? 'bg-green-600' : 'bg-gray-600'}`}>
-        {isConnected ? '🟢 Sincronizado' : '🔴 Esperando...'}
+        {isConnected ? 'Sincronizado' : 'Esperando...'}
       </div>
 
-      {/* Player 1 - Left Side */}
-      <div
-        className="flex w-1/2 flex-col items-center justify-center gap-2"
-        style={{ backgroundColor: match.players.p1.color }}
-      >
+      <div className="flex w-1/2 flex-col items-center justify-center gap-2" style={{ backgroundColor: match.players.p1.color }}>
         <div className="text-center">
           <h2 className="font-bold text-white drop-shadow-lg" style={{ fontSize: '64px' }}>
             {match.players.p1.name}
@@ -162,14 +178,9 @@ export function DisplayMode({ matchId }: DisplayModeProps) {
         </div>
       </div>
 
-      {/* Divider */}
       <div className="w-2 bg-white"></div>
 
-      {/* Player 2 - Right Side */}
-      <div
-        className="flex w-1/2 flex-col items-center justify-center gap-2"
-        style={{ backgroundColor: match.players.p2.color }}
-      >
+      <div className="flex w-1/2 flex-col items-center justify-center gap-2" style={{ backgroundColor: match.players.p2.color }}>
         <div className="text-center">
           <h2 className="font-bold text-white drop-shadow-lg" style={{ fontSize: '64px' }}>
             {match.players.p2.name}
