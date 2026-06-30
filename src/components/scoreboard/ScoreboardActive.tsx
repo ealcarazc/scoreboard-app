@@ -12,9 +12,10 @@ interface ScoreboardActiveProps {
   onAddPoint: (player: 'p1' | 'p2') => void;
   onUndo: () => void;
   onReset: () => void;
+  onSwapPlayers?: () => void;
 }
 
-export function ScoreboardActive({ match, onAddPoint, onUndo, onReset }: ScoreboardActiveProps) {
+export function ScoreboardActive({ match, onAddPoint, onUndo, onReset, onSwapPlayers }: ScoreboardActiveProps) {
   const { pointFeedback } = useTactile();
 
   const handleTapP1 = () => {
@@ -98,6 +99,7 @@ export function ScoreboardActive({ match, onAddPoint, onUndo, onReset }: Scorebo
         onUndo={onUndo}
         canUndo={match.history.length > 0}
         gameOver={!!match.result}
+        onSwap={onSwapPlayers}
       />
     </>
   );

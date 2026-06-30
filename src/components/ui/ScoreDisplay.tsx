@@ -40,11 +40,11 @@ export function ScoreDisplay({
         style={{ backgroundColor: p1Color }}
       >
         <div className="text-center">
-          <h2 className="text-lg font-bold text-white drop-shadow-lg md:text-xl">{p1Name}</h2>
-          {p1Serving && <p className="text-xs text-white drop-shadow-lg md:text-sm">Saca *</p>}
-          {subtitle1 && <p className="text-xs text-white drop-shadow-lg md:text-sm">{subtitle1}</p>}
+          <h2 className="text-2xl font-bold text-white drop-shadow-lg md:text-3xl">{p1Name}</h2>
+          {p1Serving && <p className="text-3xl text-white drop-shadow-lg">🎾</p>}
+          {subtitle1 && <p className="text-sm text-white drop-shadow-lg md:text-base">{subtitle1}</p>}
         </div>
-        <div className="text-6xl font-bold text-white drop-shadow-lg md:text-8xl">{p1Score}</div>
+        <div className="text-9xl font-bold text-white drop-shadow-lg" style={{ lineHeight: '1' }}>{p1Score}</div>
       </button>
 
       {/* Divider */}
@@ -57,11 +57,11 @@ export function ScoreDisplay({
         style={{ backgroundColor: p2Color }}
       >
         <div className="text-center">
-          <h2 className="text-lg font-bold text-white drop-shadow-lg md:text-xl">{p2Name}</h2>
-          {p2Serving && <p className="text-xs text-white drop-shadow-lg md:text-sm">Saca *</p>}
-          {subtitle2 && <p className="text-xs text-white drop-shadow-lg md:text-sm">{subtitle2}</p>}
+          <h2 className="text-2xl font-bold text-white drop-shadow-lg md:text-3xl">{p2Name}</h2>
+          {p2Serving && <p className="text-3xl text-white drop-shadow-lg">🎾</p>}
+          {subtitle2 && <p className="text-sm text-white drop-shadow-lg md:text-base">{subtitle2}</p>}
         </div>
-        <div className="text-6xl font-bold text-white drop-shadow-lg md:text-8xl">{p2Score}</div>
+        <div className="text-9xl font-bold text-white drop-shadow-lg" style={{ lineHeight: '1' }}>{p2Score}</div>
       </button>
     </div>
   );

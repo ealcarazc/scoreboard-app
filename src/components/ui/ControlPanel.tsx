@@ -7,9 +7,10 @@ interface ControlPanelProps {
   onUndo: () => void;
   canUndo: boolean;
   gameOver?: boolean;
+  onSwap?: () => void;
 }
 
-export function ControlPanel({ onReset, onUndo, canUndo, gameOver = false }: ControlPanelProps) {
+export function ControlPanel({ onReset, onUndo, canUndo, gameOver = false, onSwap }: ControlPanelProps) {
   const [showConfirmReset, setShowConfirmReset] = useState(false);
 
   const handleReset = () => {
@@ -23,12 +24,12 @@ export function ControlPanel({ onReset, onUndo, canUndo, gameOver = false }: Con
   };
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 border-t border-gray-600 bg-gray-900 p-4 shadow-lg">
-      <div className="flex justify-center gap-4">
+    <div className="fixed bottom-0 left-0 right-0 border-t border-gray-600 bg-gray-900 p-4 shadow-lg z-50">
+      <div className="flex justify-center gap-4 flex-wrap">
         <button
           onClick={onUndo}
           disabled={!canUndo}
-          className="rounded bg-blue-600 px-6 py-3 font-semibold text-white transition-all active:scale-95 disabled:opacity-50"
+          className="rounded bg-blue-600 px-6 py-3 font-semibold text-white transition-all active:scale-95 disabled:bg-gray-500 disabled:cursor-not-allowed"
         >
           ↶ Deshacer
         </button>
@@ -42,9 +43,21 @@ export function ControlPanel({ onReset, onUndo, canUndo, gameOver = false }: Con
           {showConfirmReset ? '¿Seguro? Tap de nuevo' : '🔄 Reset'}
         </button>
 
+        {!gameOver && onSwap && (
+          <button
+            onClick={onSwap}
+            className="rounded bg-purple-600 px-4 py-3 font-semibold text-white transition-all active:scale-95 hover:bg-purple-700 text-sm"
+          >
+            ↔️ Intercambiar
+          </button>
+        )}
+
         {gameOver && (
-          <button className="rounded bg-green-600 px-6 py-3 font-semibold text-white" disabled>
-            ✓ Juego terminado
+          <button
+            onClick={onReset}
+            className="rounded bg-green-600 px-6 py-3 font-semibold text-white transition-all active:scale-95 hover:bg-green-700"
+          >
+            ✓ Nuevo Juego
           </button>
         )}
       </div>

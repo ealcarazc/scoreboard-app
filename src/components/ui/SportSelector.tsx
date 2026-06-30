@@ -52,7 +52,8 @@ export function SportSelector({ onSelectSport }: SportSelectorProps) {
                 <button
                   key={format.value}
                   onClick={() => onSelectSport(sport.id as Sport, format.value)}
-                  className="w-full rounded bg-blue-600 px-4 py-3 font-semibold text-white transition-all hover:bg-blue-700 active:scale-95"
+                  className="w-full rounded bg-blue-600 px-4 py-3 font-semibold text-white transition-all hover:bg-blue-700 active:scale-95 cursor-pointer pointer-events-auto touch-none"
+                  type="button"
                 >
                   {format.label}
                 </button>

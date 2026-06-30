@@ -13,7 +13,7 @@ export default function Home() {
   const [appState, setAppState] = useState<AppState>('sport-select');
   const [selectedSport, setSelectedSport] = useState<Sport | null>(null);
   const [selectedFormat, setSelectedFormat] = useState<Format | null>(null);
-  const { match, createMatch, addPoint, undo, resetMatch } = useMatch();
+  const { match, createMatch, addPoint, undo, resetMatch, swapPlayers } = useMatch();
 
   const handleSelectSport = (sport: Sport, format: Format) => {
     setSelectedSport(sport);
@@ -53,6 +53,7 @@ export default function Home() {
       onAddPoint={addPoint}
       onUndo={undo}
       onReset={handleReset}
+      onSwapPlayers={swapPlayers}
     />
   );
 }

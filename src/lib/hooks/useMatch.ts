@@ -126,5 +126,19 @@ export function useMatch() {
     });
   }, []);
 
-  return { match, createMatch, addPoint, undo, resetMatch };
+  const swapPlayers = useCallback(() => {
+    setMatch((prev) => {
+      if (!prev) return null;
+      return {
+        ...prev,
+        players: { p1: prev.players.p2, p2: prev.players.p1 },
+        currentPoints: { p1: prev.currentPoints.p2, p2: prev.currentPoints.p1 },
+        currentGames: { p1: prev.currentGames.p2, p2: prev.currentGames.p1 },
+        currentSets: { p1: prev.currentSets.p2, p2: prev.currentSets.p1 },
+        currentServer: prev.currentServer === 'p1' ? 'p2' : 'p1',
+      };
+    });
+  }, []);
+
+  return { match, createMatch, addPoint, undo, resetMatch, swapPlayers };
 }
