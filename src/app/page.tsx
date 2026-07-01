@@ -53,9 +53,17 @@ export default function Home() {
   };
 
   const openDisplayMode = () => {
+    console.log('openDisplayMode called, match:', match?.id);
     if (match?.id) {
       const displayUrl = `${window.location.origin}/display?matchId=${match.id}`;
-      window.open(displayUrl, 'display', 'width=1024,height=768');
+      console.log('Opening display URL:', displayUrl);
+      const newWindow = window.open(displayUrl, 'display', 'width=1024,height=768');
+      if (!newWindow) {
+        alert(`URL para iPad: ${displayUrl}`);
+      }
+    } else {
+      console.error('No match ID available');
+      alert('Error: No match ID');
     }
   };
 
