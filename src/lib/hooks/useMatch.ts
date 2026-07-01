@@ -6,7 +6,6 @@ import { addPointPingPong, resetPingPongGame, undoPointPingPong, initPingPongGam
 import { nanoid } from 'nanoid';
 import { addPointSquash, resetSquashGame, undoPointSquash, initSquashGame } from '@/game/engines/squash';
 import { addPointTennis, resetTennisGame, undoPointTennis, initTennisGame } from '@/game/engines/tennis';
-import { supabase } from '@/lib/supabase/client';
 
 export function useMatch() {
   const [match, setMatch] = useState<Match | null>(null);
@@ -27,35 +26,6 @@ export function useMatch() {
         history: [],
         startTime: new Date(),
       };
-
-      // Save to Supabase immediately
-      supabase
-        .from('matches')
-        .insert({
-          id: newMatch.id,
-          sport: newMatch.sport,
-          player1_name: newMatch.players.p1.name,
-          player1_color: newMatch.players.p1.color,
-          player2_name: newMatch.players.p2.name,
-          player2_color: newMatch.players.p2.color,
-          format: newMatch.format,
-          current_points_p1: newMatch.currentPoints.p1,
-          current_points_p2: newMatch.currentPoints.p2,
-          current_games_p1: newMatch.currentGames.p1,
-          current_games_p2: newMatch.currentGames.p2,
-          current_sets_p1: newMatch.currentSets.p1,
-          current_sets_p2: newMatch.currentSets.p2,
-          current_server: newMatch.currentServer,
-          is_in_tiebreak: newMatch.isInTiebreak,
-          start_time: newMatch.startTime.toISOString(),
-        })
-        .then((result) => {
-          if (result.error) {
-            console.error('Supabase insert error:', result.error);
-          } else {
-            console.log('Match saved to Supabase:', newMatch.id);
-          }
-        });
 
       setMatch(newMatch);
       return newMatch;
