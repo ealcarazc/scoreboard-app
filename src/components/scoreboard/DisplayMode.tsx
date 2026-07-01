@@ -11,16 +11,32 @@ interface DisplayModeProps {
 export function DisplayMode({ matchId }: DisplayModeProps) {
   const [match, setMatch] = useState<Match | null>(null);
   const [isConnected, setIsConnected] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchMatch = async () => {
-      const { data, error } = await supabase
-        .from('matches')
-        .select('*')
-        .eq('id', matchId)
-        .single();
+      try {
+        console.log('Fetching match with ID:', matchId);
+        const { data, error: fetchError } = await supabase
+          .from('matches')
+          .select('*')
+          .eq('id', matchId)
+          .single();
 
-      if (data && !error) {
+        if (fetchError) {
+          console.error('Supabase error:', fetchError);
+          setError(`Error: ${fetchError.message}`);
+          return;
+        }
+
+        if (!data) {
+          console.error('No data returned for matchId:', matchId);
+          setError('Match not found in database');
+          return;
+        }
+
+        console.log('Match data loaded:', data);
+
         const p1: PlayerInfo = {
           id: 'p1',
           name: data.player1_name,
@@ -52,11 +68,16 @@ export function DisplayMode({ matchId }: DisplayModeProps) {
           history: [],
         };
         setMatch(matchData);
+        setError(null);
+      } catch (err) {
+        console.error('Unexpected error:', err);
+        setError(`Unexpected error: ${err}`);
       }
     };
 
     fetchMatch();
 
+    // Subscribe to realtime updates
     const channel = supabase
       .channel(`match:${matchId}`)
       .on(
@@ -113,6 +134,17 @@ export function DisplayMode({ matchId }: DisplayModeProps) {
     };
   }, [matchId]);
 
+  if (error) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-gray-900 text-white text-center px-4">
+        <div>
+          <p className="mb-4 text-red-400">Error: {error}</p>
+          <p className="text-sm text-gray-400">MatchID: {matchId}</p>
+        </div>
+      </div>
+    );
+  }
+
   if (!match) {
     return (
       <div className="flex h-screen items-center justify-center bg-gray-900 text-white text-2xl">
@@ -162,7 +194,7 @@ export function DisplayMode({ matchId }: DisplayModeProps) {
   return (
     <div className="flex h-screen w-screen select-none overflow-hidden bg-black">
       <div className={`absolute top-4 right-4 text-sm px-3 py-1 rounded z-10 ${isConnected ? 'bg-green-600' : 'bg-gray-600'}`}>
-        {isConnected ? 'Sincronizado' : 'Esperando...'}
+        {isConnected ? '🟢 Sincronizado' : '🔴 Esperando...'}
       </div>
 
       <div className="flex w-1/2 flex-col items-center justify-center gap-2" style={{ backgroundColor: match.players.p1.color }}>
