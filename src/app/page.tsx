@@ -58,8 +58,8 @@ export default function Home() {
       return;
     }
 
-    // Encode match data into URL
-    const matchData = JSON.stringify({
+    // Store match data in sessionStorage
+    const matchData = {
       id: match.id,
       sport: match.sport,
       players: match.players,
@@ -70,10 +70,10 @@ export default function Home() {
       currentServer: match.currentServer,
       isInTiebreak: match.isInTiebreak,
       startTime: match.startTime.toISOString(),
-    });
+    };
 
-    const encodedData = encodeURIComponent(matchData);
-    const displayUrl = `${window.location.origin}/display?data=${encodedData}`;
+    sessionStorage.setItem('displayMatch', JSON.stringify(matchData));
+    const displayUrl = `${window.location.origin}/display`;
     const newWindow = window.open(displayUrl, 'display', 'width=1024,height=768');
     if (!newWindow) {
       alert(`URL para iPad: ${displayUrl}`);

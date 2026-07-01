@@ -3,18 +3,21 @@
 import React, { useEffect, useState } from 'react';
 import type { Match } from '@/types';
 
-interface DisplayModeProps {
-  data: string;
-}
+interface DisplayModeProps {}
 
-export function DisplayMode({ data }: DisplayModeProps) {
+export function DisplayMode({}: DisplayModeProps) {
   const [match, setMatch] = useState<Match | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     try {
-      const decodedData = decodeURIComponent(data);
-      const matchData: Match = JSON.parse(decodedData);
+      const stored = sessionStorage.getItem('displayMatch');
+      if (!stored) {
+        setError('No hay datos de marcador. Abre desde el app de control.');
+        return;
+      }
+
+      const matchData: Match = JSON.parse(stored);
       matchData.startTime = new Date(matchData.startTime);
       if (matchData.endTime) {
         matchData.endTime = new Date(matchData.endTime);
@@ -25,7 +28,7 @@ export function DisplayMode({ data }: DisplayModeProps) {
       console.error('Error parsing match data:', err);
       setError(`Error: ${err}`);
     }
-  }, [data]);
+  }, []);
 
   if (error) {
     return (
