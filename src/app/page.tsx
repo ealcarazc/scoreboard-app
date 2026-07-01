@@ -52,18 +52,42 @@ export default function Home() {
     }
   };
 
-  const openDisplayMode = () => {
-    console.log('openDisplayMode called, match:', match?.id);
-    if (match?.id) {
+  const openDisplayMode = async () => {
+    if (!match?.id) {
+      alert('Error: No match ID');
+      return;
+    }
+
+    try {
+      // Save match to Supabase before opening display
+      const { supabase } = await import('@/lib/supabase/client');
+      await supabase.from('matches').insert({
+        id: match.id,
+        sport: match.sport,
+        player1_name: match.players.p1.name,
+        player1_color: match.players.p1.color,
+        player2_name: match.players.p2.name,
+        player2_color: match.players.p2.color,
+        format: match.format,
+        current_points_p1: match.currentPoints.p1,
+        current_points_p2: match.currentPoints.p2,
+        current_games_p1: match.currentGames.p1,
+        current_games_p2: match.currentGames.p2,
+        current_sets_p1: match.currentSets.p1,
+        current_sets_p2: match.currentSets.p2,
+        current_server: match.currentServer,
+        is_in_tiebreak: match.isInTiebreak,
+        start_time: match.startTime.toISOString(),
+      });
+
       const displayUrl = `${window.location.origin}/display?matchId=${match.id}`;
-      console.log('Opening display URL:', displayUrl);
       const newWindow = window.open(displayUrl, 'display', 'width=1024,height=768');
       if (!newWindow) {
         alert(`URL para iPad: ${displayUrl}`);
       }
-    } else {
-      console.error('No match ID available');
-      alert('Error: No match ID');
+    } catch (err) {
+      console.error('Error:', err);
+      alert('Error al abrir display. Intenta de nuevo.');
     }
   };
 
