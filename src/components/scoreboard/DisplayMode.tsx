@@ -44,7 +44,7 @@ export function DisplayMode({}: DisplayModeProps) {
   if (!match) {
     return (
       <div className="flex h-screen items-center justify-center bg-gray-900 text-white text-2xl">
-        Cargando marcador...
+        Cargando marcador desde sesión...
       </div>
     );
   }
