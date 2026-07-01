@@ -1,11 +1,11 @@
 // Supabase client disabled - using sessionStorage only
 export const supabase = {
-  from: () => ({
+  from: (table: string) => ({
     select: () => ({ eq: () => ({ single: () => Promise.resolve({ data: null, error: null }) }) }),
     insert: () => Promise.resolve({ data: null, error: null }),
   }),
-  channel: () => ({
+  channel: (name: string) => ({
     on: () => ({ subscribe: () => {} }),
   }),
   removeChannel: () => {},
-};
+} as any;
