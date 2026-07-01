@@ -6,20 +6,20 @@ import { DisplayMode } from '@/components/scoreboard/DisplayMode';
 
 function DisplayContent() {
   const searchParams = useSearchParams();
-  const matchId = searchParams.get('matchId');
+  const data = searchParams.get('data');
 
-  if (!matchId) {
+  if (!data) {
     return (
       <div className="flex h-screen items-center justify-center bg-gray-900 text-white text-2xl text-center px-4">
         <div>
-          <p className="mb-4">Parámetro matchId no encontrado</p>
-          <p className="text-sm text-gray-400">Usa: /display?matchId=xxxxx</p>
+          <p className="mb-4">No hay datos de marcador</p>
+          <p className="text-sm text-gray-400">Abre el display desde el app de control</p>
         </div>
       </div>
     );
   }
 
-  return <DisplayMode matchId={matchId} />;
+  return <DisplayMode data={data} />;
 }
 
 export default function DisplayPage() {

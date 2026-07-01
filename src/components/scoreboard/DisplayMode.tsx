@@ -1,145 +1,38 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabase/client';
-import type { Match, PlayerInfo } from '@/types';
+import type { Match } from '@/types';
 
 interface DisplayModeProps {
-  matchId: string;
+  data: string;
 }
 
-export function DisplayMode({ matchId }: DisplayModeProps) {
+export function DisplayMode({ data }: DisplayModeProps) {
   const [match, setMatch] = useState<Match | null>(null);
-  const [isConnected, setIsConnected] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchMatch = async () => {
-      try {
-        console.log('Fetching match with ID:', matchId);
-        const { data, error: fetchError } = await supabase
-          .from('matches')
-          .select('*')
-          .eq('id', matchId)
-          .single();
-
-        if (fetchError) {
-          console.error('Supabase error:', fetchError);
-          setError(`Error: ${fetchError.message}`);
-          return;
-        }
-
-        if (!data) {
-          console.error('No data returned for matchId:', matchId);
-          setError('Match not found in database');
-          return;
-        }
-
-        console.log('Match data loaded:', data);
-
-        const p1: PlayerInfo = {
-          id: 'p1',
-          name: data.player1_name,
-          color: data.player1_color,
-          isFrequent: false,
-        };
-
-        const p2: PlayerInfo = {
-          id: 'p2',
-          name: data.player2_name,
-          color: data.player2_color,
-          isFrequent: false,
-        };
-
-        const matchData: Match = {
-          id: data.id,
-          sport: data.sport,
-          players: { p1, p2 },
-          format: data.format,
-          currentSet: 1,
-          currentPoints: { p1: data.current_points_p1, p2: data.current_points_p2 },
-          currentGames: { p1: data.current_games_p1, p2: data.current_games_p2 },
-          currentSets: { p1: data.current_sets_p1, p2: data.current_sets_p2 },
-          currentServer: data.current_server,
-          isInTiebreak: data.is_in_tiebreak,
-          result: data.result,
-          startTime: new Date(data.start_time),
-          endTime: data.end_time ? new Date(data.end_time) : undefined,
-          history: [],
-        };
-        setMatch(matchData);
-        setError(null);
-      } catch (err) {
-        console.error('Unexpected error:', err);
-        setError(`Unexpected error: ${err}`);
+    try {
+      const decodedData = decodeURIComponent(data);
+      const matchData: Match = JSON.parse(decodedData);
+      matchData.startTime = new Date(matchData.startTime);
+      if (matchData.endTime) {
+        matchData.endTime = new Date(matchData.endTime);
       }
-    };
-
-    fetchMatch();
-
-    // Subscribe to realtime updates
-    const channel = supabase
-      .channel(`match:${matchId}`)
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'matches',
-          filter: `id=eq.${matchId}`,
-        },
-        (payload) => {
-          if (payload.new) {
-            const data = payload.new as any;
-
-            const p1: PlayerInfo = {
-              id: 'p1',
-              name: data.player1_name,
-              color: data.player1_color,
-              isFrequent: false,
-            };
-
-            const p2: PlayerInfo = {
-              id: 'p2',
-              name: data.player2_name,
-              color: data.player2_color,
-              isFrequent: false,
-            };
-
-            const matchData: Match = {
-              id: data.id,
-              sport: data.sport,
-              players: { p1, p2 },
-              format: data.format,
-              currentSet: 1,
-              currentPoints: { p1: data.current_points_p1, p2: data.current_points_p2 },
-              currentGames: { p1: data.current_games_p1, p2: data.current_games_p2 },
-              currentSets: { p1: data.current_sets_p1, p2: data.current_sets_p2 },
-              currentServer: data.current_server,
-              isInTiebreak: data.is_in_tiebreak,
-              result: data.result,
-              startTime: new Date(data.start_time),
-              endTime: data.end_time ? new Date(data.end_time) : undefined,
-              history: [],
-            };
-            setMatch(matchData);
-            setIsConnected(true);
-          }
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [matchId]);
+      setMatch(matchData);
+      setError(null);
+    } catch (err) {
+      console.error('Error parsing match data:', err);
+      setError(`Error: ${err}`);
+    }
+  }, [data]);
 
   if (error) {
     return (
       <div className="flex h-screen items-center justify-center bg-gray-900 text-white text-center px-4">
         <div>
-          <p className="mb-4 text-red-400">Error: {error}</p>
-          <p className="text-sm text-gray-400">MatchID: {matchId}</p>
+          <p className="mb-4 text-red-400">Error cargando marcador</p>
+          <p className="text-sm text-gray-400">{error}</p>
         </div>
       </div>
     );
@@ -193,9 +86,6 @@ export function DisplayMode({ matchId }: DisplayModeProps) {
 
   return (
     <div className="flex h-screen w-screen select-none overflow-hidden bg-black">
-      <div className={`absolute top-4 right-4 text-sm px-3 py-1 rounded z-10 ${isConnected ? 'bg-green-600' : 'bg-gray-600'}`}>
-        {isConnected ? '🟢 Sincronizado' : '🔴 Esperando...'}
-      </div>
 
       <div className="flex w-1/2 flex-col items-center justify-center gap-2" style={{ backgroundColor: match.players.p1.color }}>
         <div className="text-center">
