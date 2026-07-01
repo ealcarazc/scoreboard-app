@@ -1,12 +1,11 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { ScoreDisplay } from '@/components/ui/ScoreDisplay';
 import { ControlPanel } from '@/components/ui/ControlPanel';
 import { ResultScreen } from './ResultScreen';
 import { useTactile } from '@/lib/hooks/useTactile';
 import { useSwipeDetection } from '@/lib/hooks/useSwipeDetection';
-import { useRealtimeMatch } from '@/lib/hooks/useRealtimeMatch';
 import type { Match } from '@/types';
 
 interface ScoreboardActiveProps {
@@ -26,12 +25,6 @@ export function ScoreboardActive({ match, onAddPoint, onUndo, onReset, onNewMatc
     return <ResultScreen match={match} onNewMatch={onNewMatch} onBackToMenu={onBackToMenu} />;
   }
   const { pointFeedback } = useTactile();
-  const { updateMatch } = useRealtimeMatch(match.id);
-
-  // Sync match to Supabase whenever it changes
-  useEffect(() => {
-    updateMatch(match);
-  }, [match, updateMatch]);
 
   const handleTapP1 = () => {
     pointFeedback();
