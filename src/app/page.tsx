@@ -14,7 +14,7 @@ export default function Home() {
   const [selectedSport, setSelectedSport] = useState<Sport | null>(null);
   const [selectedFormat, setSelectedFormat] = useState<Format | null>(null);
   const [lastPlayers, setLastPlayers] = useState<{ p1: PlayerInfo; p2: PlayerInfo } | null>(null);
-  const { match, createMatch, addPoint, undo, resetMatch } = useMatch();
+  const { match, createMatch, addPoint, undo, resetMatch, swapPlayers } = useMatch();
 
   // Load sticky sport from localStorage
   useEffect(() => {
@@ -93,6 +93,7 @@ export default function Home() {
       onReset={handleReset}
       onNewMatch={handleNewMatch}
       onBackToMenu={handleBackToMenu}
+      onSwapPlayers={swapPlayers}
       onOpenDisplay={openDisplayMode}
     />
   );
