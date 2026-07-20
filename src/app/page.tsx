@@ -5,6 +5,7 @@ import { SportSelector } from '@/components/ui/SportSelector';
 import { PlayerSelector } from '@/components/ui/PlayerSelector';
 import { ScoreboardActive } from '@/components/scoreboard/ScoreboardActive';
 import { useMatch } from '@/lib/hooks/useMatch';
+import { saveRecentPair } from '@/lib/recentPairs';
 import type { PlayerInfo, Sport, Format } from '@/types';
 
 type AppState = 'sport-select' | 'player-select' | 'playing';
@@ -37,6 +38,7 @@ export default function Home() {
   const handleSelectPlayers = (p1: PlayerInfo, p2: PlayerInfo) => {
     if (selectedSport && selectedFormat) {
       setLastPlayers({ p1, p2 });
+      saveRecentPair(p1, p2);
       createMatch(selectedSport, p1, p2, selectedFormat);
       setAppState('playing');
     }

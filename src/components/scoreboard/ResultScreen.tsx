@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import type { Match } from '@/types';
+import { recordMatchResult, type SessionStats } from '@/lib/sessionStats';
 
 interface ResultScreenProps {
   match: Match;
@@ -9,29 +10,24 @@ interface ResultScreenProps {
   onBackToMenu: () => void;
 }
 
-interface GameStats {
-  [playerName: string]: number;
-}
-
 export function ResultScreen({ match, onNewMatch, onBackToMenu }: ResultScreenProps) {
   const winner = match.result === 'p1_win' ? match.players.p1 : match.players.p2;
   const loser = match.result === 'p1_win' ? match.players.p2 : match.players.p1;
-  const [gameStats, setGameStats] = useState<GameStats>({});
+  const [stats, setStats] = useState<SessionStats>({});
 
   useEffect(() => {
-    // Load and update game stats
-    const saved = localStorage.getItem('gameStats');
-    const stats: GameStats = saved ? JSON.parse(saved) : {};
+    const updated = recordMatchResult(winner.name, loser.name);
+    setStats(updated);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [winner.name, loser.name, match.result]);
 
-    // Increment winner's games won count
-    stats[winner.name] = (stats[winner.name] || 0) + 1;
-
-    localStorage.setItem('gameStats', JSON.stringify(stats));
-    setGameStats(stats);
-  }, [winner.name, match.result]);
+  const rows = Object.entries(stats).sort(([, a], [, b]) => b.wins - a.wins);
 
   return (
     <div className="flex h-screen w-screen flex-col items-center justify-center bg-gradient-to-b from-green-600 to-green-900 text-white">
+      <div className="mb-4 text-8xl" style={{ animation: 'trophyBounce 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)' }}>
+        🏆
+      </div>
       <h1 className="mb-8 text-6xl font-bold">¡{winner.name} GANÓ!</h1>
 
       <div className="mb-8 flex gap-12 text-center">
@@ -48,17 +44,19 @@ export function ResultScreen({ match, onNewMatch, onBackToMenu }: ResultScreenPr
 
       <p className="mb-8 text-2xl">Duración: {Math.round((match.endTime?.getTime()! - match.startTime.getTime()) / 60000)} minutos</p>
 
-      {/* Game stats counter */}
+      {/* Session standings */}
       <div className="mb-12 text-center">
-        <p className="mb-4 text-xl font-semibold">📊 Juegos Ganados:</p>
-        <div className="flex gap-8 text-lg">
-          {Object.entries(gameStats)
-            .sort(([, a], [, b]) => b - a)
-            .map(([name, wins]) => (
-              <div key={name}>
-                <p>{name}: <span className="font-bold text-2xl">{wins}</span></p>
-              </div>
-            ))}
+        <p className="mb-4 text-xl font-semibold">📊 Tabla de Sesión:</p>
+        <div className="flex flex-wrap justify-center gap-8 text-lg">
+          {rows.map(([name, s], i) => (
+            <div key={name}>
+              <p>
+                {i === 0 && '🏆 '}
+                {name}: <span className="font-bold text-2xl">{s.wins}</span>{' '}
+                <span className="text-sm text-white/70">({s.matches} partidos)</span>
+              </p>
+            </div>
+          ))}
         </div>
       </div>
 
@@ -77,6 +75,14 @@ export function ResultScreen({ match, onNewMatch, onBackToMenu }: ResultScreenPr
           ← Menú
         </button>
       </div>
+
+      <style>{`
+        @keyframes trophyBounce {
+          0% { transform: scale(0) rotate(-15deg); opacity: 0; }
+          60% { transform: scale(1.2) rotate(8deg); opacity: 1; }
+          100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+      `}</style>
     </div>
   );
 }

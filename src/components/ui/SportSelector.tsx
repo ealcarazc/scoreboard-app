@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import type { Sport, Format } from '@/types';
+import { SessionStandingsModal } from '@/components/scoreboard/SessionStandingsModal';
 
 interface SportSelectorProps {
   onSelectSport: (sport: Sport, format: Format) => void;
@@ -9,6 +10,7 @@ interface SportSelectorProps {
 
 export function SportSelector({ onSelectSport }: SportSelectorProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [showStandings, setShowStandings] = useState(false);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -194,6 +196,13 @@ export function SportSelector({ onSelectSport }: SportSelectorProps) {
 
         {/* Footer hint */}
         <div className="mt-16 text-center">
+          <button
+            onClick={() => setShowStandings(true)}
+            className="mb-3 text-sm transition-opacity hover:opacity-70"
+            style={{ color: '#787774', fontFamily: "'Geist Sans', sans-serif" }}
+          >
+            🏆 Tabla de sesión
+          </button>
           <p
             className="text-xs"
             style={{
@@ -206,6 +215,8 @@ export function SportSelector({ onSelectSport }: SportSelectorProps) {
           </p>
         </div>
       </div>
+
+      <SessionStandingsModal isOpen={showStandings} onClose={() => setShowStandings(false)} />
 
       <style>{`
         @keyframes slideUp {

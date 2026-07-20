@@ -2,12 +2,23 @@
 
 import React, { useEffect, useState } from 'react';
 import type { Match } from '@/types';
+import { isMatchPoint } from '@/game/matchPoint';
+import { getSessionStats, getSessionLeaders } from '@/lib/sessionStats';
+
+// Fluid font-size that also accounts for text length, so wider strings
+// like "DEUCE" or "AD" shrink to fit instead of overflowing their panel.
+function scoreFontSize(score: number | string): string {
+  const length = Math.max(String(score).length, 1);
+  const widthFactor = Math.min(72 / length, 40);
+  return `clamp(3rem, min(${widthFactor}cqw, 45cqh), 18rem)`;
+}
 
 interface DisplayModeProps {}
 
 export function DisplayMode({}: DisplayModeProps) {
   const [match, setMatch] = useState<Match | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [leaders, setLeaders] = useState<string[]>([]);
 
   useEffect(() => {
     try {
@@ -24,6 +35,7 @@ export function DisplayMode({}: DisplayModeProps) {
       }
       setMatch(matchData);
       setError(null);
+      setLeaders(getSessionLeaders(getSessionStats()));
     } catch (err) {
       console.error('Error parsing match data:', err);
       setError(`Error: ${err}`);
@@ -86,37 +98,97 @@ export function DisplayMode({}: DisplayModeProps) {
 
   const p1Serving = match.currentServer === 'p1';
   const p2Serving = match.currentServer === 'p2';
+  const p1MatchPoint = isMatchPoint(match, 'p1');
+  const p2MatchPoint = isMatchPoint(match, 'p2');
+  const p1Leader = leaders.includes(match.players.p1.name);
+  const p2Leader = leaders.includes(match.players.p2.name);
 
   return (
     <div className="flex h-screen w-screen select-none overflow-hidden bg-black">
-
-      <div className="flex w-1/2 flex-col items-center justify-center gap-2" style={{ backgroundColor: match.players.p1.color }}>
+      <div
+        className="relative flex w-1/2 flex-col items-center justify-center gap-2"
+        style={{ backgroundColor: match.players.p1.color, containerType: 'size' }}
+      >
+        {p1Serving && (
+          <span className="absolute left-6 top-6 drop-shadow-lg" style={{ fontSize: 'clamp(2.5rem, 12cqmin, 6rem)' }}>
+            🎾
+          </span>
+        )}
+        {p1MatchPoint && (
+          <div className="absolute left-1/2 top-[8%] -translate-x-1/2">
+            <span
+              className="inline-block whitespace-nowrap rounded-full bg-white/15 px-6 py-2 font-bold text-white drop-shadow-lg"
+              style={{ fontSize: 'clamp(1.25rem, 7cqw, 3rem)', animation: 'pulseMatchPoint 1s ease-in-out infinite' }}
+            >
+              MATCH POINT
+            </span>
+          </div>
+        )}
         <div className="text-center">
-          <h2 className="font-bold text-white drop-shadow-lg" style={{ fontSize: '64px' }}>
+          <h2 className="font-bold text-white drop-shadow-lg" style={{ fontSize: 'clamp(1.5rem, min(8cqw, 8cqh), 4rem)' }}>
+            {p1Leader && '🏆 '}
             {match.players.p1.name}
           </h2>
-          {p1Serving && <p className="text-5xl text-white drop-shadow-lg">🎾</p>}
-          {subtitle1 && <p className="text-xl text-white drop-shadow-lg">{subtitle1}</p>}
+          {subtitle1 && (
+            <p className="text-white drop-shadow-lg" style={{ fontSize: 'clamp(1rem, 3cqh, 1.25rem)' }}>
+              {subtitle1}
+            </p>
+          )}
         </div>
-        <div className="font-bold text-white drop-shadow-lg" style={{ fontSize: '280px', lineHeight: '1' }}>
+        <div
+          className="font-bold text-white drop-shadow-lg"
+          style={{ fontSize: scoreFontSize(p1Score), lineHeight: '1' }}
+        >
           {p1Score}
         </div>
       </div>
 
       <div className="w-2 bg-white"></div>
 
-      <div className="flex w-1/2 flex-col items-center justify-center gap-2" style={{ backgroundColor: match.players.p2.color }}>
+      <div
+        className="relative flex w-1/2 flex-col items-center justify-center gap-2"
+        style={{ backgroundColor: match.players.p2.color, containerType: 'size' }}
+      >
+        {p2Serving && (
+          <span className="absolute right-6 top-6 drop-shadow-lg" style={{ fontSize: 'clamp(2.5rem, 12cqmin, 6rem)' }}>
+            🎾
+          </span>
+        )}
+        {p2MatchPoint && (
+          <div className="absolute left-1/2 top-[8%] -translate-x-1/2">
+            <span
+              className="inline-block whitespace-nowrap rounded-full bg-white/15 px-6 py-2 font-bold text-white drop-shadow-lg"
+              style={{ fontSize: 'clamp(1.25rem, 7cqw, 3rem)', animation: 'pulseMatchPoint 1s ease-in-out infinite' }}
+            >
+              MATCH POINT
+            </span>
+          </div>
+        )}
         <div className="text-center">
-          <h2 className="font-bold text-white drop-shadow-lg" style={{ fontSize: '64px' }}>
+          <h2 className="font-bold text-white drop-shadow-lg" style={{ fontSize: 'clamp(1.5rem, min(8cqw, 8cqh), 4rem)' }}>
+            {p2Leader && '🏆 '}
             {match.players.p2.name}
           </h2>
-          {p2Serving && <p className="text-5xl text-white drop-shadow-lg">🎾</p>}
-          {subtitle2 && <p className="text-xl text-white drop-shadow-lg">{subtitle2}</p>}
+          {subtitle2 && (
+            <p className="text-white drop-shadow-lg" style={{ fontSize: 'clamp(1rem, 3cqh, 1.25rem)' }}>
+              {subtitle2}
+            </p>
+          )}
         </div>
-        <div className="font-bold text-white drop-shadow-lg" style={{ fontSize: '280px', lineHeight: '1' }}>
+        <div
+          className="font-bold text-white drop-shadow-lg"
+          style={{ fontSize: scoreFontSize(p2Score), lineHeight: '1' }}
+        >
           {p2Score}
         </div>
       </div>
+
+      <style>{`
+        @keyframes pulseMatchPoint {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.7; transform: scale(1.05); }
+        }
+      `}</style>
     </div>
   );
 }

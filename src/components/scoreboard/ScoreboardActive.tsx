@@ -1,11 +1,14 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { ScoreDisplay } from '@/components/ui/ScoreDisplay';
 import { ControlPanel } from '@/components/ui/ControlPanel';
 import { ResultScreen } from './ResultScreen';
+import { SessionStandingsModal } from './SessionStandingsModal';
 import { useTactile } from '@/lib/hooks/useTactile';
 import { useSwipeDetection } from '@/lib/hooks/useSwipeDetection';
+import { isMatchPoint } from '@/game/matchPoint';
+import { getSessionStats, getSessionLeaders } from '@/lib/sessionStats';
 import type { Match } from '@/types';
 
 interface ScoreboardActiveProps {
@@ -20,11 +23,13 @@ interface ScoreboardActiveProps {
 }
 
 export function ScoreboardActive({ match, onAddPoint, onUndo, onReset, onNewMatch, onBackToMenu, onSwapPlayers, onOpenDisplay }: ScoreboardActiveProps) {
-  // Show result screen if game is over
-  if (match.result && onNewMatch && onBackToMenu) {
-    return <ResultScreen match={match} onNewMatch={onNewMatch} onBackToMenu={onBackToMenu} />;
-  }
+  const [leaders, setLeaders] = useState<string[]>([]);
+  const [showStandings, setShowStandings] = useState(false);
   const { pointFeedback } = useTactile();
+
+  useEffect(() => {
+    setLeaders(getSessionLeaders(getSessionStats()));
+  }, [match.id, match.result]);
 
   const handleTapP1 = () => {
     pointFeedback();
@@ -44,6 +49,11 @@ export function ScoreboardActive({ match, onAddPoint, onUndo, onReset, onNewMatc
     },
     !match.result
   );
+
+  // Show result screen if game is over
+  if (match.result && onNewMatch && onBackToMenu) {
+    return <ResultScreen match={match} onNewMatch={onNewMatch} onBackToMenu={onBackToMenu} />;
+  }
 
   const p1Serving = match.currentServer === 'p1';
   const p2Serving = match.currentServer === 'p2';
@@ -86,6 +96,9 @@ export function ScoreboardActive({ match, onAddPoint, onUndo, onReset, onNewMatc
     }
   }
 
+  const p1MatchPoint = isMatchPoint(match, 'p1');
+  const p2MatchPoint = isMatchPoint(match, 'p2');
+
   return (
     <>
       <ScoreDisplay
@@ -99,6 +112,10 @@ export function ScoreboardActive({ match, onAddPoint, onUndo, onReset, onNewMatc
         p2Serving={p2Serving}
         subtitle1={subtitle1}
         subtitle2={subtitle2}
+        p1MatchPoint={p1MatchPoint}
+        p2MatchPoint={p2MatchPoint}
+        p1SessionLeader={leaders.includes(match.players.p1.name)}
+        p2SessionLeader={leaders.includes(match.players.p2.name)}
         onTapP1={handleTapP1}
         onTapP2={handleTapP2}
       />
@@ -109,7 +126,9 @@ export function ScoreboardActive({ match, onAddPoint, onUndo, onReset, onNewMatc
         gameOver={!!match.result}
         onSwap={onSwapPlayers}
         onOpenDisplay={onOpenDisplay}
+        onOpenStandings={() => setShowStandings(true)}
       />
+      <SessionStandingsModal isOpen={showStandings} onClose={() => setShowStandings(false)} />
     </>
   );
 }

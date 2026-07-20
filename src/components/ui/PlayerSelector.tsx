@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import type { PlayerInfo } from '@/types';
+import { getRecentPairs, type RecentPair } from '@/lib/recentPairs';
 
 const DEFAULT_PLAYERS = [
   { id: '1', name: 'Ernesto', color: '#3b82f6', isFrequent: true },
@@ -35,6 +36,27 @@ export function PlayerSelector({ onSelectPlayers }: PlayerSelectorProps) {
   const [showCustomP2, setShowCustomP2] = useState(false);
   const [customNameP1, setCustomNameP1] = useState('');
   const [customNameP2, setCustomNameP2] = useState('');
+  const [recentPairs, setRecentPairs] = useState<RecentPair[]>([]);
+
+  useEffect(() => {
+    setRecentPairs(getRecentPairs());
+  }, []);
+
+  const handleQuickSelect = (pair: RecentPair) => {
+    const player1: PlayerInfo = {
+      id: `recent-${pair.player1.name}`,
+      name: pair.player1.name,
+      color: pair.player1.color,
+      isFrequent: false,
+    };
+    const player2: PlayerInfo = {
+      id: `recent-${pair.player2.name}`,
+      name: pair.player2.name,
+      color: pair.player2.color,
+      isFrequent: false,
+    };
+    onSelectPlayers(player1, player2);
+  };
 
   const handleAddCustomPlayer = (isP1: boolean, customName: string) => {
     if (!customName.trim()) return;
@@ -164,6 +186,25 @@ export function PlayerSelector({ onSelectPlayers }: PlayerSelectorProps) {
   return (
     <div className="flex min-h-screen flex-col bg-gray-900 p-6 text-white">
       <h1 className="mb-8 text-center text-4xl font-bold">Elige Jugadores</h1>
+
+      {recentPairs.length > 0 && (
+        <div className="mx-auto mb-8 w-full max-w-2xl">
+          <h3 className="mb-2 text-sm font-semibold text-gray-400">⚡ Parejas recientes</h3>
+          <div className="flex flex-wrap gap-2">
+            {recentPairs.map((pair, i) => (
+              <button
+                key={i}
+                onClick={() => handleQuickSelect(pair)}
+                className="flex items-center gap-2 rounded-full bg-gray-800 px-4 py-2 text-sm transition-all hover:bg-gray-700 active:scale-95"
+              >
+                <span className="h-3 w-3 rounded-full" style={{ backgroundColor: pair.player1.color }} />
+                {pair.player1.name} vs {pair.player2.name}
+                <span className="h-3 w-3 rounded-full" style={{ backgroundColor: pair.player2.color }} />
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="mb-8 grid grid-cols-2 gap-6">
         <PlayerSection
