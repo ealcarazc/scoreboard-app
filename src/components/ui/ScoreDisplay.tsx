@@ -6,8 +6,8 @@ import React, { useState } from 'react';
 // like "DEUCE" or "AD" shrink to fit instead of overflowing their panel.
 function scoreFontSize(score: number | string): string {
   const length = Math.max(String(score).length, 1);
-  const widthFactor = Math.min(72 / length, 40);
-  return `clamp(2.5rem, min(${widthFactor}cqw, 45cqh), 15rem)`;
+  const widthFactor = Math.min(72 / length, 50);
+  return `clamp(2.5rem, min(${widthFactor}cqw, 45cqh), 18rem)`;
 }
 
 interface ScoreDisplayProps {
@@ -63,26 +63,17 @@ export function ScoreDisplay({
   };
 
   return (
-    <div className="flex h-screen w-screen select-none overflow-hidden bg-black">
-      {/* Player 1 - Left Side */}
+    <div className="sb-root relative flex h-full w-full select-none overflow-hidden bg-black">
+      {/* Player 1 */}
       <button
         onClick={handleP1Click}
-        className={`relative flex w-1/2 flex-col items-center justify-center gap-2 transition-all active:opacity-80 ${
+        className={`sb-panel relative flex flex-col items-center justify-center gap-2 transition-all active:opacity-80 ${
           flashP1 ? 'brightness-150' : ''
         }`}
         style={{ backgroundColor: p1Color, containerType: 'size' }}
       >
-        {p1Serving && (
-          <span
-            className="absolute left-4 top-4 drop-shadow-lg md:left-6 md:top-6"
-            style={{ fontSize: 'clamp(2rem, 12cqmin, 5rem)' }}
-          >
-            🎾
-          </span>
-        )}
-
         {p1MatchPoint && (
-          <div className="absolute left-1/2 top-[8%] -translate-x-1/2">
+          <div className="absolute left-1/2 top-[4%] -translate-x-1/2">
             <span
               className="inline-block whitespace-nowrap rounded-full bg-white/15 px-4 py-1 font-bold text-white drop-shadow-lg"
               style={{ fontSize: 'clamp(0.75rem, 7cqw, 1.75rem)', animation: 'pulseMatchPoint 1s ease-in-out infinite' }}
@@ -95,11 +86,16 @@ export function ScoreDisplay({
         <div className="text-center">
           <h2
             className="font-bold text-white drop-shadow-lg"
-            style={{ fontSize: 'clamp(1.25rem, min(8cqw, 8cqh), 3rem)' }}
+            style={{ fontSize: 'clamp(1.25rem, min(8cqw, 8cqh), 3.5rem)' }}
           >
             {p1SessionLeader && '🏆 '}
             {p1Name}
           </h2>
+          {p1Serving && (
+            <div className="drop-shadow-lg" style={{ fontSize: 'clamp(2rem, 14cqmin, 6rem)', lineHeight: '1.2' }}>
+              🎾
+            </div>
+          )}
           {subtitle1 && (
             <p className="text-white drop-shadow-lg" style={{ fontSize: 'clamp(0.75rem, 2.5cqh, 1.1rem)' }}>
               {subtitle1}
@@ -115,27 +111,18 @@ export function ScoreDisplay({
       </button>
 
       {/* Divider */}
-      <div className="w-1 bg-white"></div>
+      <div className="sb-divider bg-white"></div>
 
-      {/* Player 2 - Right Side */}
+      {/* Player 2 */}
       <button
         onClick={handleP2Click}
-        className={`relative flex w-1/2 flex-col items-center justify-center gap-2 transition-all active:opacity-80 ${
+        className={`sb-panel relative flex flex-col items-center justify-center gap-2 transition-all active:opacity-80 ${
           flashP2 ? 'brightness-150' : ''
         }`}
         style={{ backgroundColor: p2Color, containerType: 'size' }}
       >
-        {p2Serving && (
-          <span
-            className="absolute right-4 top-4 drop-shadow-lg md:right-6 md:top-6"
-            style={{ fontSize: 'clamp(2rem, 12cqmin, 5rem)' }}
-          >
-            🎾
-          </span>
-        )}
-
         {p2MatchPoint && (
-          <div className="absolute left-1/2 top-[8%] -translate-x-1/2">
+          <div className="absolute left-1/2 top-[4%] -translate-x-1/2">
             <span
               className="inline-block whitespace-nowrap rounded-full bg-white/15 px-4 py-1 font-bold text-white drop-shadow-lg"
               style={{ fontSize: 'clamp(0.75rem, 7cqw, 1.75rem)', animation: 'pulseMatchPoint 1s ease-in-out infinite' }}
@@ -148,11 +135,16 @@ export function ScoreDisplay({
         <div className="text-center">
           <h2
             className="font-bold text-white drop-shadow-lg"
-            style={{ fontSize: 'clamp(1.25rem, min(8cqw, 8cqh), 3rem)' }}
+            style={{ fontSize: 'clamp(1.25rem, min(8cqw, 8cqh), 3.5rem)' }}
           >
             {p2SessionLeader && '🏆 '}
             {p2Name}
           </h2>
+          {p2Serving && (
+            <div className="drop-shadow-lg" style={{ fontSize: 'clamp(2rem, 14cqmin, 6rem)', lineHeight: '1.2' }}>
+              🎾
+            </div>
+          )}
           {subtitle2 && (
             <p className="text-white drop-shadow-lg" style={{ fontSize: 'clamp(0.75rem, 2.5cqh, 1.1rem)' }}>
               {subtitle2}
@@ -171,6 +163,18 @@ export function ScoreDisplay({
         @keyframes pulseMatchPoint {
           0%, 100% { opacity: 1; transform: scale(1); }
           50% { opacity: 0.7; transform: scale(1.05); }
+        }
+
+        .sb-panel { flex: 1 1 0; }
+
+        @media (orientation: portrait) {
+          .sb-root { flex-direction: column; }
+          .sb-divider { width: 100%; height: 2px; }
+        }
+
+        @media (orientation: landscape) {
+          .sb-root { flex-direction: row; }
+          .sb-divider { width: 2px; height: 100%; }
         }
       `}</style>
     </div>

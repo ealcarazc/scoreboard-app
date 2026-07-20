@@ -26,29 +26,29 @@ export function ControlPanel({ onReset, onUndo, canUndo, gameOver = false, onSwa
   };
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 border-t border-gray-600 bg-gray-900 p-4 shadow-lg z-50">
-      <div className="flex justify-center gap-4 flex-wrap">
+    <div className="w-full flex-none border-t border-gray-600 bg-gray-900 shadow-lg">
+      <div className="flex items-center gap-2 overflow-x-auto px-2 py-2">
         <button
           onClick={onUndo}
           disabled={!canUndo}
-          className="rounded bg-blue-600 px-6 py-3 font-semibold text-white transition-all active:scale-95 disabled:bg-gray-500 disabled:cursor-not-allowed"
+          className="shrink-0 whitespace-nowrap rounded bg-blue-600 px-3 py-2 text-sm font-semibold text-white transition-all active:scale-95 disabled:bg-gray-500 disabled:cursor-not-allowed"
         >
           ↶ Deshacer
         </button>
 
         <button
           onClick={handleReset}
-          className={`rounded px-6 py-3 font-semibold text-white transition-all active:scale-95 ${
+          className={`shrink-0 whitespace-nowrap rounded px-3 py-2 text-sm font-semibold text-white transition-all active:scale-95 ${
             showConfirmReset ? 'bg-red-700' : 'bg-gray-700 hover:bg-gray-600'
           }`}
         >
-          {showConfirmReset ? '¿Seguro? Tap de nuevo' : '🔄 Reset'}
+          {showConfirmReset ? '¿Seguro?' : '🔄 Reset'}
         </button>
 
         {!gameOver && onSwap && (
           <button
             onClick={onSwap}
-            className="rounded bg-purple-600 px-4 py-3 font-semibold text-white transition-all active:scale-95 hover:bg-purple-700 text-sm"
+            className="shrink-0 whitespace-nowrap rounded bg-purple-600 px-3 py-2 text-sm font-semibold text-white transition-all active:scale-95 hover:bg-purple-700"
           >
             ↔️ Intercambiar
           </button>
@@ -57,7 +57,7 @@ export function ControlPanel({ onReset, onUndo, canUndo, gameOver = false, onSwa
         {!gameOver && onOpenDisplay && (
           <button
             onClick={onOpenDisplay}
-            className="rounded bg-orange-600 px-4 py-3 font-semibold text-white transition-all active:scale-95 hover:bg-orange-700 text-sm"
+            className="shrink-0 whitespace-nowrap rounded bg-orange-600 px-3 py-2 text-sm font-semibold text-white transition-all active:scale-95 hover:bg-orange-700"
           >
             📺 Pantalla
           </button>
@@ -66,7 +66,7 @@ export function ControlPanel({ onReset, onUndo, canUndo, gameOver = false, onSwa
         {onOpenStandings && (
           <button
             onClick={onOpenStandings}
-            className="rounded bg-yellow-600 px-4 py-3 font-semibold text-white transition-all active:scale-95 hover:bg-yellow-700 text-sm"
+            className="shrink-0 whitespace-nowrap rounded bg-yellow-600 px-3 py-2 text-sm font-semibold text-white transition-all active:scale-95 hover:bg-yellow-700"
           >
             🏆 Tabla
           </button>
@@ -75,7 +75,7 @@ export function ControlPanel({ onReset, onUndo, canUndo, gameOver = false, onSwa
         {gameOver && (
           <button
             onClick={onReset}
-            className="rounded bg-green-600 px-6 py-3 font-semibold text-white transition-all active:scale-95 hover:bg-green-700"
+            className="shrink-0 whitespace-nowrap rounded bg-green-600 px-3 py-2 text-sm font-semibold text-white transition-all active:scale-95 hover:bg-green-700"
           >
             ✓ Nuevo Juego
           </button>

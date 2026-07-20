@@ -100,25 +100,27 @@ export function ScoreboardActive({ match, onAddPoint, onUndo, onReset, onNewMatc
   const p2MatchPoint = isMatchPoint(match, 'p2');
 
   return (
-    <>
-      <ScoreDisplay
-        p1Name={match.players.p1.name}
-        p2Name={match.players.p2.name}
-        p1Score={p1Score}
-        p2Score={p2Score}
-        p1Color={match.players.p1.color}
-        p2Color={match.players.p2.color}
-        p1Serving={p1Serving}
-        p2Serving={p2Serving}
-        subtitle1={subtitle1}
-        subtitle2={subtitle2}
-        p1MatchPoint={p1MatchPoint}
-        p2MatchPoint={p2MatchPoint}
-        p1SessionLeader={leaders.includes(match.players.p1.name)}
-        p2SessionLeader={leaders.includes(match.players.p2.name)}
-        onTapP1={handleTapP1}
-        onTapP2={handleTapP2}
-      />
+    <div className="flex h-[100dvh] w-screen flex-col overflow-hidden bg-black">
+      <div className="min-h-0 flex-1">
+        <ScoreDisplay
+          p1Name={match.players.p1.name}
+          p2Name={match.players.p2.name}
+          p1Score={p1Score}
+          p2Score={p2Score}
+          p1Color={match.players.p1.color}
+          p2Color={match.players.p2.color}
+          p1Serving={p1Serving}
+          p2Serving={p2Serving}
+          subtitle1={subtitle1}
+          subtitle2={subtitle2}
+          p1MatchPoint={p1MatchPoint}
+          p2MatchPoint={p2MatchPoint}
+          p1SessionLeader={leaders.includes(match.players.p1.name)}
+          p2SessionLeader={leaders.includes(match.players.p2.name)}
+          onTapP1={handleTapP1}
+          onTapP2={handleTapP2}
+        />
+      </div>
       <ControlPanel
         onReset={onReset}
         onUndo={onUndo}
@@ -129,6 +131,6 @@ export function ScoreboardActive({ match, onAddPoint, onUndo, onReset, onNewMatc
         onOpenStandings={() => setShowStandings(true)}
       />
       <SessionStandingsModal isOpen={showStandings} onClose={() => setShowStandings(false)} />
-    </>
+    </div>
   );
 }
