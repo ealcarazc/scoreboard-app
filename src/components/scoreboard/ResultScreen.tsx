@@ -87,7 +87,7 @@ export function ResultScreen({ match, onNewMatch, onBackToMenu, onRematchWithPai
           onClick={onNewMatch}
           className="rounded-lg bg-blue-600 px-8 py-4 text-2xl font-bold hover:bg-blue-700 active:scale-95"
         >
-          🎮 Otro Partido
+          🎮 Jugar otra vez
         </button>
 
         <button
