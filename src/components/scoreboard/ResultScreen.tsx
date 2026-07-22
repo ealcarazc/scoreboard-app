@@ -1,19 +1,22 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import type { Match } from '@/types';
+import type { Match, PlayerInfo } from '@/types';
 import { recordMatchResult, type SessionStats } from '@/lib/sessionStats';
+import { getRecentPairs, type RecentPair } from '@/lib/recentPairs';
 
 interface ResultScreenProps {
   match: Match;
   onNewMatch: () => void;
   onBackToMenu: () => void;
+  onRematchWithPair?: (p1: PlayerInfo, p2: PlayerInfo) => void;
 }
 
-export function ResultScreen({ match, onNewMatch, onBackToMenu }: ResultScreenProps) {
+export function ResultScreen({ match, onNewMatch, onBackToMenu, onRematchWithPair }: ResultScreenProps) {
   const winner = match.result === 'p1_win' ? match.players.p1 : match.players.p2;
   const loser = match.result === 'p1_win' ? match.players.p2 : match.players.p1;
   const [stats, setStats] = useState<SessionStats>({});
+  const [recentPairs, setRecentPairs] = useState<RecentPair[]>([]);
 
   useEffect(() => {
     const updated = recordMatchResult(winner.name, loser.name);
@@ -21,14 +24,33 @@ export function ResultScreen({ match, onNewMatch, onBackToMenu }: ResultScreenPr
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [winner.name, loser.name, match.result]);
 
+  useEffect(() => {
+    const pairKey = (a: string, b: string) => [a, b].sort().join('|');
+    const currentKey = pairKey(match.players.p1.name, match.players.p2.name);
+    setRecentPairs(
+      getRecentPairs().filter((p) => pairKey(p.player1.name, p.player2.name) !== currentKey)
+    );
+  }, [match.players.p1.name, match.players.p2.name]);
+
   const rows = Object.entries(stats).sort(([, a], [, b]) => b.wins - a.wins);
 
+  const setsLabel = `Sets ${match.currentSets.p1}-${match.currentSets.p2}`;
+
+  const handleQuickRematch = (pair: RecentPair) => {
+    if (!onRematchWithPair) return;
+    const p1: PlayerInfo = { id: `recent-${pair.player1.name}`, name: pair.player1.name, color: pair.player1.color, isFrequent: false };
+    const p2: PlayerInfo = { id: `recent-${pair.player2.name}`, name: pair.player2.name, color: pair.player2.color, isFrequent: false };
+    onRematchWithPair(p1, p2);
+  };
+
   return (
-    <div className="flex h-screen w-screen flex-col items-center justify-center bg-gradient-to-b from-green-600 to-green-900 text-white">
+    <div className="flex h-screen w-screen flex-col items-center justify-center overflow-y-auto bg-gradient-to-b from-green-600 to-green-900 p-6 text-white">
       <div className="mb-4 text-8xl" style={{ animation: 'trophyBounce 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)' }}>
         🏆
       </div>
-      <h1 className="mb-8 text-6xl font-bold">¡{winner.name} GANÓ!</h1>
+      <h1 className="mb-2 text-center text-6xl font-bold">¡{winner.name} GANÓ!</h1>
+
+      {match.sport === 'tennis' && <p className="mb-4 text-2xl">{setsLabel}</p>}
 
       <div className="mb-8 flex gap-12 text-center">
         <div>
@@ -45,7 +67,7 @@ export function ResultScreen({ match, onNewMatch, onBackToMenu }: ResultScreenPr
       <p className="mb-8 text-2xl">Duración: {Math.round((match.endTime?.getTime()! - match.startTime.getTime()) / 60000)} minutos</p>
 
       {/* Session standings */}
-      <div className="mb-12 text-center">
+      <div className="mb-8 text-center">
         <p className="mb-4 text-xl font-semibold">📊 Tabla de Sesión:</p>
         <div className="flex flex-wrap justify-center gap-8 text-lg">
           {rows.map(([name, s], i) => (
@@ -75,6 +97,26 @@ export function ResultScreen({ match, onNewMatch, onBackToMenu }: ResultScreenPr
           ← Menú
         </button>
       </div>
+
+      {/* Quick rematch with a different frequent opponent */}
+      {onRematchWithPair && recentPairs.length > 0 && (
+        <div className="mt-10 w-full max-w-md text-center">
+          <p className="mb-3 text-sm font-semibold text-white/70">⚡ O empieza revancha con:</p>
+          <div className="flex flex-wrap justify-center gap-2">
+            {recentPairs.map((pair, i) => (
+              <button
+                key={i}
+                onClick={() => handleQuickRematch(pair)}
+                className="flex items-center gap-2 rounded-full bg-black/20 px-4 py-2 text-sm transition-all hover:bg-black/30 active:scale-95"
+              >
+                <span className="h-3 w-3 rounded-full" style={{ backgroundColor: pair.player1.color }} />
+                {pair.player1.name} vs {pair.player2.name}
+                <span className="h-3 w-3 rounded-full" style={{ backgroundColor: pair.player2.color }} />
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       <style>{`
         @keyframes trophyBounce {

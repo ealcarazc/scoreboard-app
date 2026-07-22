@@ -21,7 +21,7 @@ export function useMatch() {
         currentPoints: { p1: 0, p2: 0 },
         currentGames: { p1: 0, p2: 0 },
         currentSets: { p1: 0, p2: 0 },
-        currentServer: 'p1',
+        currentServer: Math.random() < 0.5 ? 'p1' : 'p2',
         isInTiebreak: false,
         history: [],
         startTime: new Date(),

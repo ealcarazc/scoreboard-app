@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 
 // Fluid font-size that also accounts for text length, so wider strings
 // like "DEUCE" or "AD" shrink to fit instead of overflowing their panel.
@@ -9,6 +9,8 @@ function scoreFontSize(score: number | string): string {
   const widthFactor = Math.min(72 / length, 50);
   return `clamp(2.5rem, min(${widthFactor}cqw, 45cqh), 18rem)`;
 }
+
+const DOUBLE_TAP_WINDOW_MS = 300;
 
 interface ScoreDisplayProps {
   p1Name: string;
@@ -25,8 +27,8 @@ interface ScoreDisplayProps {
   p2MatchPoint?: boolean;
   p1SessionLeader?: boolean;
   p2SessionLeader?: boolean;
-  onTapP1: () => void;
-  onTapP2: () => void;
+  onTapP1: (isAce?: boolean) => void;
+  onTapP2: (isAce?: boolean) => void;
 }
 
 export function ScoreDisplay({
@@ -50,16 +52,49 @@ export function ScoreDisplay({
   const [flashP1, setFlashP1] = useState(false);
   const [flashP2, setFlashP2] = useState(false);
 
+  const p1LastTap = useRef(0);
+  const p1PendingTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const p2LastTap = useRef(0);
+  const p2PendingTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const handleP1Click = () => {
     setFlashP1(true);
     setTimeout(() => setFlashP1(false), 150);
-    onTapP1();
+
+    const now = Date.now();
+    if (now - p1LastTap.current < DOUBLE_TAP_WINDOW_MS) {
+      if (p1PendingTimer.current) {
+        clearTimeout(p1PendingTimer.current);
+        p1PendingTimer.current = null;
+      }
+      onTapP1(true);
+    } else {
+      p1PendingTimer.current = setTimeout(() => {
+        onTapP1(false);
+        p1PendingTimer.current = null;
+      }, DOUBLE_TAP_WINDOW_MS);
+    }
+    p1LastTap.current = now;
   };
 
   const handleP2Click = () => {
     setFlashP2(true);
     setTimeout(() => setFlashP2(false), 150);
-    onTapP2();
+
+    const now = Date.now();
+    if (now - p2LastTap.current < DOUBLE_TAP_WINDOW_MS) {
+      if (p2PendingTimer.current) {
+        clearTimeout(p2PendingTimer.current);
+        p2PendingTimer.current = null;
+      }
+      onTapP2(true);
+    } else {
+      p2PendingTimer.current = setTimeout(() => {
+        onTapP2(false);
+        p2PendingTimer.current = null;
+      }, DOUBLE_TAP_WINDOW_MS);
+    }
+    p2LastTap.current = now;
   };
 
   return (
@@ -73,17 +108,21 @@ export function ScoreDisplay({
         style={{ backgroundColor: p1Color, containerType: 'size' }}
       >
         {p1MatchPoint && (
-          <div className="absolute left-1/2 top-[4%] -translate-x-1/2">
+          <div className="mp-glow absolute inset-0 pointer-events-none" />
+        )}
+
+        {p1MatchPoint && (
+          <div className="absolute left-1/2 top-[4%] -translate-x-1/2 z-10">
             <span
-              className="inline-block whitespace-nowrap rounded-full bg-white/15 px-4 py-1 font-bold text-white drop-shadow-lg"
-              style={{ fontSize: 'clamp(0.75rem, 7cqw, 1.75rem)', animation: 'pulseMatchPoint 1s ease-in-out infinite' }}
+              className="mp-badge inline-block whitespace-nowrap rounded-full bg-black/30 px-5 py-2 font-black uppercase text-white drop-shadow-lg"
+              style={{ fontSize: 'clamp(1.5rem, 10cqw, 4rem)', letterSpacing: '0.03em' }}
             >
-              MATCH POINT
+              Match Point
             </span>
           </div>
         )}
 
-        <div className="text-center">
+        <div className="relative z-10 text-center">
           <h2
             className="font-bold text-white drop-shadow-lg"
             style={{ fontSize: 'clamp(1.25rem, min(8cqw, 8cqh), 3.5rem)' }}
@@ -103,7 +142,7 @@ export function ScoreDisplay({
           )}
         </div>
         <div
-          className="font-bold text-white drop-shadow-lg"
+          className="relative z-10 font-bold text-white drop-shadow-lg"
           style={{ fontSize: scoreFontSize(p1Score), lineHeight: '1' }}
         >
           {p1Score}
@@ -122,17 +161,21 @@ export function ScoreDisplay({
         style={{ backgroundColor: p2Color, containerType: 'size' }}
       >
         {p2MatchPoint && (
-          <div className="absolute left-1/2 top-[4%] -translate-x-1/2">
+          <div className="mp-glow absolute inset-0 pointer-events-none" />
+        )}
+
+        {p2MatchPoint && (
+          <div className="absolute left-1/2 top-[4%] -translate-x-1/2 z-10">
             <span
-              className="inline-block whitespace-nowrap rounded-full bg-white/15 px-4 py-1 font-bold text-white drop-shadow-lg"
-              style={{ fontSize: 'clamp(0.75rem, 7cqw, 1.75rem)', animation: 'pulseMatchPoint 1s ease-in-out infinite' }}
+              className="mp-badge inline-block whitespace-nowrap rounded-full bg-black/30 px-5 py-2 font-black uppercase text-white drop-shadow-lg"
+              style={{ fontSize: 'clamp(1.5rem, 10cqw, 4rem)', letterSpacing: '0.03em' }}
             >
-              MATCH POINT
+              Match Point
             </span>
           </div>
         )}
 
-        <div className="text-center">
+        <div className="relative z-10 text-center">
           <h2
             className="font-bold text-white drop-shadow-lg"
             style={{ fontSize: 'clamp(1.25rem, min(8cqw, 8cqh), 3.5rem)' }}
@@ -152,7 +195,7 @@ export function ScoreDisplay({
           )}
         </div>
         <div
-          className="font-bold text-white drop-shadow-lg"
+          className="relative z-10 font-bold text-white drop-shadow-lg"
           style={{ fontSize: scoreFontSize(p2Score), lineHeight: '1' }}
         >
           {p2Score}
@@ -160,9 +203,20 @@ export function ScoreDisplay({
       </button>
 
       <style>{`
-        @keyframes pulseMatchPoint {
+        @keyframes pulseMatchBadge {
           0%, 100% { opacity: 1; transform: scale(1); }
-          50% { opacity: 0.7; transform: scale(1.05); }
+          50% { opacity: 0.85; transform: scale(1.08); }
+        }
+
+        @keyframes pulseMatchGlow {
+          0%, 100% { opacity: 0.15; }
+          50% { opacity: 0.55; }
+        }
+
+        .mp-badge { animation: pulseMatchBadge 0.7s ease-in-out infinite; }
+        .mp-glow {
+          background: radial-gradient(circle at 50% 30%, rgba(255, 215, 0, 0.9) 0%, transparent 70%);
+          animation: pulseMatchGlow 0.7s ease-in-out infinite;
         }
 
         .sb-panel { flex: 1 1 0; }

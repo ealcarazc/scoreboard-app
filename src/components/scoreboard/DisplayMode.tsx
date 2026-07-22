@@ -109,17 +109,18 @@ export function DisplayMode({}: DisplayModeProps) {
         className="sb-panel relative flex flex-col items-center justify-center gap-2"
         style={{ backgroundColor: match.players.p1.color, containerType: 'size' }}
       >
+        {p1MatchPoint && <div className="mp-glow absolute inset-0 pointer-events-none" />}
         {p1MatchPoint && (
-          <div className="absolute left-1/2 top-[4%] -translate-x-1/2">
+          <div className="absolute left-1/2 top-[4%] -translate-x-1/2 z-10">
             <span
-              className="inline-block whitespace-nowrap rounded-full bg-white/15 px-6 py-2 font-bold text-white drop-shadow-lg"
-              style={{ fontSize: 'clamp(1.25rem, 7cqw, 3rem)', animation: 'pulseMatchPoint 1s ease-in-out infinite' }}
+              className="mp-badge inline-block whitespace-nowrap rounded-full bg-black/30 px-6 py-2 font-black uppercase text-white drop-shadow-lg"
+              style={{ fontSize: 'clamp(1.75rem, 9cqw, 4.5rem)', letterSpacing: '0.03em' }}
             >
-              MATCH POINT
+              Match Point
             </span>
           </div>
         )}
-        <div className="text-center">
+        <div className="relative z-10 text-center">
           <h2 className="font-bold text-white drop-shadow-lg" style={{ fontSize: 'clamp(1.5rem, min(8cqw, 8cqh), 4.5rem)' }}>
             {p1Leader && '🏆 '}
             {match.players.p1.name}
@@ -136,7 +137,7 @@ export function DisplayMode({}: DisplayModeProps) {
           )}
         </div>
         <div
-          className="font-bold text-white drop-shadow-lg"
+          className="relative z-10 font-bold text-white drop-shadow-lg"
           style={{ fontSize: scoreFontSize(p1Score), lineHeight: '1' }}
         >
           {p1Score}
@@ -149,17 +150,18 @@ export function DisplayMode({}: DisplayModeProps) {
         className="sb-panel relative flex flex-col items-center justify-center gap-2"
         style={{ backgroundColor: match.players.p2.color, containerType: 'size' }}
       >
+        {p2MatchPoint && <div className="mp-glow absolute inset-0 pointer-events-none" />}
         {p2MatchPoint && (
-          <div className="absolute left-1/2 top-[4%] -translate-x-1/2">
+          <div className="absolute left-1/2 top-[4%] -translate-x-1/2 z-10">
             <span
-              className="inline-block whitespace-nowrap rounded-full bg-white/15 px-6 py-2 font-bold text-white drop-shadow-lg"
-              style={{ fontSize: 'clamp(1.25rem, 7cqw, 3rem)', animation: 'pulseMatchPoint 1s ease-in-out infinite' }}
+              className="mp-badge inline-block whitespace-nowrap rounded-full bg-black/30 px-6 py-2 font-black uppercase text-white drop-shadow-lg"
+              style={{ fontSize: 'clamp(1.75rem, 9cqw, 4.5rem)', letterSpacing: '0.03em' }}
             >
-              MATCH POINT
+              Match Point
             </span>
           </div>
         )}
-        <div className="text-center">
+        <div className="relative z-10 text-center">
           <h2 className="font-bold text-white drop-shadow-lg" style={{ fontSize: 'clamp(1.5rem, min(8cqw, 8cqh), 4.5rem)' }}>
             {p2Leader && '🏆 '}
             {match.players.p2.name}
@@ -176,7 +178,7 @@ export function DisplayMode({}: DisplayModeProps) {
           )}
         </div>
         <div
-          className="font-bold text-white drop-shadow-lg"
+          className="relative z-10 font-bold text-white drop-shadow-lg"
           style={{ fontSize: scoreFontSize(p2Score), lineHeight: '1' }}
         >
           {p2Score}
@@ -184,9 +186,20 @@ export function DisplayMode({}: DisplayModeProps) {
       </div>
 
       <style>{`
-        @keyframes pulseMatchPoint {
+        @keyframes pulseMatchBadge {
           0%, 100% { opacity: 1; transform: scale(1); }
-          50% { opacity: 0.7; transform: scale(1.05); }
+          50% { opacity: 0.85; transform: scale(1.08); }
+        }
+
+        @keyframes pulseMatchGlow {
+          0%, 100% { opacity: 0.15; }
+          50% { opacity: 0.55; }
+        }
+
+        .mp-badge { animation: pulseMatchBadge 0.7s ease-in-out infinite; }
+        .mp-glow {
+          background: radial-gradient(circle at 50% 30%, rgba(255, 215, 0, 0.9) 0%, transparent 70%);
+          animation: pulseMatchGlow 0.7s ease-in-out infinite;
         }
 
         .sb-panel { flex: 1 1 0; }

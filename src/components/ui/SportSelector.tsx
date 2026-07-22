@@ -11,6 +11,30 @@ interface SportSelectorProps {
 export function SportSelector({ onSelectSport }: SportSelectorProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [showStandings, setShowStandings] = useState(false);
+  const [quickContinue, setQuickContinue] = useState<{
+    sport: Sport;
+    format: Format;
+    sportName: string;
+    formatLabel: string;
+  } | null>(null);
+
+  useEffect(() => {
+    const savedSport = localStorage.getItem('lastSport') as Sport | null;
+    const savedFormat = localStorage.getItem('lastFormat') as Format | null;
+    if (!savedSport || !savedFormat) return;
+
+    const sportDef = sports.find((s) => s.id === savedSport);
+    const formatDef = sportDef?.formats.find((f) => f.value === savedFormat);
+    if (sportDef && formatDef) {
+      setQuickContinue({
+        sport: savedSport,
+        format: savedFormat,
+        sportName: sportDef.name,
+        formatLabel: formatDef.label,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -60,7 +84,7 @@ export function SportSelector({ onSelectSport }: SportSelectorProps) {
   ];
 
   return (
-    <div className="min-h-screen bg-white" style={{ backgroundColor: '#F7F6F3' }}>
+    <div className="sb-select min-h-screen" style={{ backgroundColor: 'var(--sb-bg)' }}>
       {/* Ambient background gradient */}
       <div
         className="fixed inset-0 pointer-events-none"
@@ -77,7 +101,7 @@ export function SportSelector({ onSelectSport }: SportSelectorProps) {
             className="mb-4 text-5xl md:text-6xl font-light"
             style={{
               fontFamily: "'Instrument Serif', 'Newsreader', serif",
-              color: '#111111',
+              color: 'var(--sb-text)',
               letterSpacing: '-0.02em',
               lineHeight: '1.1',
             }}
@@ -87,7 +111,7 @@ export function SportSelector({ onSelectSport }: SportSelectorProps) {
           <p
             className="text-lg"
             style={{
-              color: '#787774',
+              color: 'var(--sb-text-secondary)',
               fontFamily: "'Geist Sans', sans-serif",
               lineHeight: '1.6',
             }}
@@ -95,6 +119,31 @@ export function SportSelector({ onSelectSport }: SportSelectorProps) {
             Selecciona el deporte y el formato que deseas jugar
           </p>
         </div>
+
+        {quickContinue && (
+          <div className="mx-auto mb-10 w-full max-w-5xl">
+            <button
+              onClick={() => onSelectSport(quickContinue.sport, quickContinue.format)}
+              className="w-full transition-all duration-200 active:scale-95"
+              style={{
+                backgroundColor: 'var(--sb-button-bg)',
+                color: 'var(--sb-button-text)',
+                padding: '18px 24px',
+                borderRadius: '10px',
+                border: 'none',
+                fontFamily: "'Geist Sans', sans-serif",
+                fontSize: '16px',
+                fontWeight: '600',
+                letterSpacing: '0.01em',
+                cursor: 'pointer',
+                textAlign: 'left',
+              }}
+              type="button"
+            >
+              ▶ Continuar: {quickContinue.sportName} · {quickContinue.formatLabel}
+            </button>
+          </div>
+        )}
 
         {/* Sports Grid - Asymmetric Bento */}
         <div className="mx-auto w-full max-w-5xl">
@@ -117,8 +166,8 @@ export function SportSelector({ onSelectSport }: SportSelectorProps) {
                 <div
                   className="group h-full flex flex-col p-8 transition-all duration-200 hover:shadow-sm"
                   style={{
-                    backgroundColor: '#FFFFFF',
-                    border: '1px solid #EAEAEA',
+                    backgroundColor: 'var(--sb-card-bg)',
+                    border: '1px solid var(--sb-card-border)',
                     borderRadius: '12px',
                     boxShadow: '0 0 0 0 rgba(0, 0, 0, 0)',
                   }}
@@ -136,7 +185,7 @@ export function SportSelector({ onSelectSport }: SportSelectorProps) {
                     className="mb-3 text-2xl font-medium"
                     style={{
                       fontFamily: "'Instrument Serif', serif",
-                      color: '#111111',
+                      color: 'var(--sb-text)',
                       letterSpacing: '-0.01em',
                     }}
                   >
@@ -147,7 +196,7 @@ export function SportSelector({ onSelectSport }: SportSelectorProps) {
                   <p
                     className="mb-8 flex-grow text-sm leading-relaxed"
                     style={{
-                      color: '#787774',
+                      color: 'var(--sb-text-secondary)',
                       fontFamily: "'Geist Sans', sans-serif",
                       lineHeight: '1.6',
                     }}
@@ -163,8 +212,8 @@ export function SportSelector({ onSelectSport }: SportSelectorProps) {
                         onClick={() => onSelectSport(sport.id as Sport, format.value)}
                         className="w-full transition-all duration-200 active:scale-95"
                         style={{
-                          backgroundColor: '#111111',
-                          color: '#FFFFFF',
+                          backgroundColor: 'var(--sb-button-bg)',
+                          color: 'var(--sb-button-text)',
                           padding: '12px 16px',
                           borderRadius: '6px',
                           border: 'none',
@@ -176,11 +225,11 @@ export function SportSelector({ onSelectSport }: SportSelectorProps) {
                         }}
                         onMouseEnter={(e) => {
                           (e.currentTarget as HTMLButtonElement).style.backgroundColor =
-                            '#333333';
+                            'var(--sb-button-bg-hover)';
                         }}
                         onMouseLeave={(e) => {
                           (e.currentTarget as HTMLButtonElement).style.backgroundColor =
-                            '#111111';
+                            'var(--sb-button-bg)';
                         }}
                         type="button"
                       >
@@ -199,14 +248,14 @@ export function SportSelector({ onSelectSport }: SportSelectorProps) {
           <button
             onClick={() => setShowStandings(true)}
             className="mb-3 text-sm transition-opacity hover:opacity-70"
-            style={{ color: '#787774', fontFamily: "'Geist Sans', sans-serif" }}
+            style={{ color: 'var(--sb-text-secondary)', fontFamily: "'Geist Sans', sans-serif" }}
           >
             🏆 Tabla de sesión
           </button>
           <p
             className="text-xs"
             style={{
-              color: '#EAEAEA',
+              color: 'var(--sb-text-faint)',
               fontFamily: "'Geist Mono', monospace",
               letterSpacing: '0.05em',
             }}
@@ -219,6 +268,32 @@ export function SportSelector({ onSelectSport }: SportSelectorProps) {
       <SessionStandingsModal isOpen={showStandings} onClose={() => setShowStandings(false)} />
 
       <style>{`
+        .sb-select {
+          --sb-bg: #F7F6F3;
+          --sb-text: #111111;
+          --sb-text-secondary: #787774;
+          --sb-text-faint: #EAEAEA;
+          --sb-card-bg: #FFFFFF;
+          --sb-card-border: #EAEAEA;
+          --sb-button-bg: #111111;
+          --sb-button-bg-hover: #333333;
+          --sb-button-text: #FFFFFF;
+        }
+
+        @media (prefers-color-scheme: dark) {
+          .sb-select {
+            --sb-bg: #0A0A0A;
+            --sb-text: #F5F5F5;
+            --sb-text-secondary: #9B9B98;
+            --sb-text-faint: #333333;
+            --sb-card-bg: #161616;
+            --sb-card-border: #2A2A2A;
+            --sb-button-bg: #F5F5F5;
+            --sb-button-bg-hover: #FFFFFF;
+            --sb-button-text: #111111;
+          }
+        }
+
         @keyframes slideUp {
           from {
             opacity: 0;

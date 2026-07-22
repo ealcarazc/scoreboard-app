@@ -46,40 +46,15 @@ export default function Home() {
 
   const handleNewMatch = () => {
     if (lastPlayers && selectedSport && selectedFormat) {
-      const newMatch = createMatch(selectedSport, lastPlayers.p1, lastPlayers.p2, selectedFormat);
-      // Save match ID for display mode
-      if (newMatch) {
-        localStorage.setItem('currentMatchId', newMatch.id);
-      }
+      createMatch(selectedSport, lastPlayers.p1, lastPlayers.p2, selectedFormat);
     }
   };
 
-  const openDisplayMode = () => {
-    if (!match?.id) {
-      alert('Error: No match ID');
-      return;
-    }
-
-    // Store match data in sessionStorage
-    const matchData = {
-      id: match.id,
-      sport: match.sport,
-      players: match.players,
-      format: match.format,
-      currentPoints: match.currentPoints,
-      currentGames: match.currentGames,
-      currentSets: match.currentSets,
-      currentServer: match.currentServer,
-      isInTiebreak: match.isInTiebreak,
-      startTime: match.startTime.toISOString(),
-    };
-
-    sessionStorage.setItem('displayMatch', JSON.stringify(matchData));
-    const displayUrl = `${window.location.origin}/display`;
-    const newWindow = window.open(displayUrl, 'display', 'width=1024,height=768');
-    if (!newWindow) {
-      alert(`URL para iPad: ${displayUrl}`);
-    }
+  const handleRematchWithPair = (p1: PlayerInfo, p2: PlayerInfo) => {
+    if (!selectedSport || !selectedFormat) return;
+    setLastPlayers({ p1, p2 });
+    saveRecentPair(p1, p2);
+    createMatch(selectedSport, p1, p2, selectedFormat);
   };
 
   const handleBackToMenu = () => {
@@ -117,7 +92,7 @@ export default function Home() {
       onNewMatch={handleNewMatch}
       onBackToMenu={handleBackToMenu}
       onSwapPlayers={swapPlayers}
-      onOpenDisplay={openDisplayMode}
+      onRematchWithPair={handleRematchWithPair}
     />
   );
 }

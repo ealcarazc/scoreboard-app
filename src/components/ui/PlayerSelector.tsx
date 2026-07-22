@@ -103,10 +103,19 @@ export function PlayerSelector({ onSelectPlayers }: PlayerSelectorProps) {
     setCustomName
   }: any) => {
     const title = isP1 ? 'Jugador 1' : 'Jugador 2';
+    const previewColor = COLOR_OPTIONS[colorIdx];
 
     return (
       <div className="rounded-lg bg-gray-800 p-6">
         <h2 className="mb-4 text-xl font-semibold">{title}</h2>
+
+        {/* Live color preview */}
+        <div
+          className="mb-4 flex h-16 items-center justify-center rounded-lg font-bold text-white drop-shadow-lg transition-colors duration-200"
+          style={{ backgroundColor: previewColor }}
+        >
+          {selectedPlayer?.name || '—'}
+        </div>
 
         {/* Predefined Players */}
         <div className="mb-4 space-y-2">

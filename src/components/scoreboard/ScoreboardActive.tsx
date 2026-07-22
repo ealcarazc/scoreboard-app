@@ -19,25 +19,33 @@ interface ScoreboardActiveProps {
   onNewMatch?: () => void;
   onBackToMenu?: () => void;
   onSwapPlayers?: () => void;
-  onOpenDisplay?: () => void;
+  onRematchWithPair?: (p1: Match['players']['p1'], p2: Match['players']['p2']) => void;
 }
 
-export function ScoreboardActive({ match, onAddPoint, onUndo, onReset, onNewMatch, onBackToMenu, onSwapPlayers, onOpenDisplay }: ScoreboardActiveProps) {
+export function ScoreboardActive({ match, onAddPoint, onUndo, onReset, onNewMatch, onBackToMenu, onSwapPlayers, onRematchWithPair }: ScoreboardActiveProps) {
   const [leaders, setLeaders] = useState<string[]>([]);
   const [showStandings, setShowStandings] = useState(false);
-  const { pointFeedback } = useTactile();
+  const { pointFeedback, aceFeedback } = useTactile();
 
   useEffect(() => {
     setLeaders(getSessionLeaders(getSessionStats()));
   }, [match.id, match.result]);
 
-  const handleTapP1 = () => {
-    pointFeedback();
+  const handleTapP1 = (isAce?: boolean) => {
+    if (isAce) {
+      aceFeedback();
+    } else {
+      pointFeedback();
+    }
     onAddPoint('p1');
   };
 
-  const handleTapP2 = () => {
-    pointFeedback();
+  const handleTapP2 = (isAce?: boolean) => {
+    if (isAce) {
+      aceFeedback();
+    } else {
+      pointFeedback();
+    }
     onAddPoint('p2');
   };
 
@@ -52,7 +60,14 @@ export function ScoreboardActive({ match, onAddPoint, onUndo, onReset, onNewMatc
 
   // Show result screen if game is over
   if (match.result && onNewMatch && onBackToMenu) {
-    return <ResultScreen match={match} onNewMatch={onNewMatch} onBackToMenu={onBackToMenu} />;
+    return (
+      <ResultScreen
+        match={match}
+        onNewMatch={onNewMatch}
+        onBackToMenu={onBackToMenu}
+        onRematchWithPair={onRematchWithPair}
+      />
+    );
   }
 
   const p1Serving = match.currentServer === 'p1';
@@ -127,7 +142,6 @@ export function ScoreboardActive({ match, onAddPoint, onUndo, onReset, onNewMatc
         canUndo={match.history.length > 0}
         gameOver={!!match.result}
         onSwap={onSwapPlayers}
-        onOpenDisplay={onOpenDisplay}
         onOpenStandings={() => setShowStandings(true)}
       />
       <SessionStandingsModal isOpen={showStandings} onClose={() => setShowStandings(false)} />

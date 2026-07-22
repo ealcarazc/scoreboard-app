@@ -66,5 +66,42 @@ export function useTactile() {
     playBeep(200, 80);
   };
 
-  return { vibrate, playBeep, pointFeedback };
+  // Short celebratory ascending arpeggio for a double-tap "Ace" point
+  const aceFeedback = () => {
+    vibrate([40, 40, 40, 40, 90]);
+    const ctx = getAudioContext();
+    if (!ctx) return;
+
+    try {
+      if (ctx.state === 'suspended') {
+        ctx.resume().catch(() => {});
+      }
+
+      const notes = [440, 554.37, 659.25, 880]; // A4, C#5, E5, A5
+      const noteDuration = 0.09;
+
+      notes.forEach((freq, i) => {
+        const start = ctx.currentTime + i * noteDuration;
+        const oscillator = ctx.createOscillator();
+        const gainNode = ctx.createGain();
+
+        oscillator.connect(gainNode);
+        gainNode.connect(ctx.destination);
+
+        oscillator.frequency.value = freq;
+        oscillator.type = 'triangle';
+
+        gainNode.gain.setValueAtTime(0.001, start);
+        gainNode.gain.exponentialRampToValueAtTime(0.25, start + 0.01);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, start + noteDuration);
+
+        oscillator.start(start);
+        oscillator.stop(start + noteDuration);
+      });
+    } catch (e) {
+      console.debug('Ace audio playback error:', e);
+    }
+  };
+
+  return { vibrate, playBeep, pointFeedback, aceFeedback };
 }
