@@ -6,9 +6,9 @@ import { getRecentPairs, type RecentPair } from '@/lib/recentPairs';
 
 const DEFAULT_PLAYERS = [
   { id: '1', name: 'Ernesto', color: '#3b82f6', isFrequent: true },
-  { id: '2', name: 'Liz', color: '#ef4444', isFrequent: true },
   { id: '3', name: 'Lila', color: '#8b5cf6', isFrequent: true },
   { id: '4', name: 'Maia', color: '#f59e0b', isFrequent: true },
+  { id: '2', name: 'Liz', color: '#ef4444', isFrequent: true },
 ];
 
 const COLOR_OPTIONS = [
@@ -100,7 +100,8 @@ export function PlayerSelector({ onSelectPlayers }: PlayerSelectorProps) {
     showCustom,
     setShowCustom,
     customName,
-    setCustomName
+    setCustomName,
+    opponentId,
   }: any) => {
     const title = isP1 ? 'Jugador 1' : 'Jugador 2';
     const previewColor = COLOR_OPTIONS[colorIdx];
@@ -119,21 +120,28 @@ export function PlayerSelector({ onSelectPlayers }: PlayerSelectorProps) {
 
         {/* Predefined Players */}
         <div className="mb-4 space-y-2">
-          {allPlayers.map((player) => (
-            <button
-              key={player.id}
-              onClick={() => onSelectPlayer(player)}
-              className={`block w-full rounded px-4 py-2 text-left transition-all ${
-                selectedPlayer?.id === player.id
-                  ? isP1
-                    ? 'bg-blue-600 font-semibold'
-                    : 'bg-red-600 font-semibold'
-                  : 'bg-gray-700 hover:bg-gray-600'
-              }`}
-            >
-              {player.name}
-            </button>
-          ))}
+          {allPlayers.map((player) => {
+            const isSelected = selectedPlayer?.id === player.id;
+            const isTakenByOpponent = player.id === opponentId;
+
+            return (
+              <button
+                key={player.id}
+                onClick={() => !isTakenByOpponent && onSelectPlayer(player)}
+                disabled={isTakenByOpponent}
+                className={`block w-full rounded px-4 py-2 text-left transition-all ${
+                  isTakenByOpponent
+                    ? 'bg-gray-800 text-gray-600 cursor-not-allowed'
+                    : isSelected
+                      ? 'font-semibold text-white drop-shadow-lg'
+                      : 'bg-gray-700 hover:bg-gray-600'
+                }`}
+                style={isSelected && !isTakenByOpponent ? { backgroundColor: previewColor } : undefined}
+              >
+                {player.name}
+              </button>
+            );
+          })}
         </div>
 
         {/* Custom Name Input */}
@@ -226,6 +234,7 @@ export function PlayerSelector({ onSelectPlayers }: PlayerSelectorProps) {
           setShowCustom={setShowCustomP1}
           customName={customNameP1}
           setCustomName={setCustomNameP1}
+          opponentId={p2?.id}
         />
 
         <PlayerSection
@@ -238,6 +247,7 @@ export function PlayerSelector({ onSelectPlayers }: PlayerSelectorProps) {
           setShowCustom={setShowCustomP2}
           customName={customNameP2}
           setCustomName={setCustomNameP2}
+          opponentId={p1?.id}
         />
       </div>
 
