@@ -1,104 +1,77 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import type { Sport, Format } from '@/types';
 import { SessionStandingsModal } from '@/components/scoreboard/SessionStandingsModal';
+import { SPORT_ICON, SPORT_COLOR, SPORT_NAME } from '@/lib/sportIcons';
 
 interface SportSelectorProps {
   onSelectSport: (sport: Sport, format: Format) => void;
 }
 
+interface SportDef {
+  id: Sport;
+  formats: { value: Format; label: string }[];
+}
+
+const SPORTS: SportDef[] = [
+  {
+    id: 'tennis',
+    formats: [
+      { value: 'best-of-3', label: 'Mejor de 3' },
+      { value: 'best-of-5', label: 'Mejor de 5' },
+    ],
+  },
+  {
+    id: 'pingpong',
+    formats: [
+      { value: '11-points', label: '11 puntos' },
+      { value: '21-points', label: '21 puntos' },
+    ],
+  },
+  {
+    id: 'squash',
+    formats: [{ value: '11-points', label: '11 puntos' }],
+  },
+];
+
+function hexToRgba(hex: string, alpha: number): string {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
 export function SportSelector({ onSelectSport }: SportSelectorProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
   const [showStandings, setShowStandings] = useState(false);
-  const [quickContinue, setQuickContinue] = useState<{
-    sport: Sport;
-    format: Format;
-    sportName: string;
-    formatLabel: string;
-  } | null>(null);
+  const [selectedId, setSelectedId] = useState<Sport | null>(null);
 
   useEffect(() => {
     const savedSport = localStorage.getItem('lastSport') as Sport | null;
-    const savedFormat = localStorage.getItem('lastFormat') as Format | null;
-    if (!savedSport || !savedFormat) return;
-
-    const sportDef = sports.find((s) => s.id === savedSport);
-    const formatDef = sportDef?.formats.find((f) => f.value === savedFormat);
-    if (sportDef && formatDef) {
-      setQuickContinue({
-        sport: savedSport,
-        format: savedFormat,
-        sportName: sportDef.name,
-        formatLabel: formatDef.label,
-      });
+    if (savedSport && SPORTS.some((s) => s.id === savedSport)) {
+      setSelectedId(savedSport);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('animate-in');
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
-
-    const cards = containerRef.current?.querySelectorAll('[data-animate]');
-    cards?.forEach((card) => observer.observe(card));
-
-    return () => observer.disconnect();
-  }, []);
-
-  const sports = [
-    {
-      id: 'pingpong',
-      name: 'Ping-Pong',
-      description: 'Juego acelerado a 11 puntos o 21 puntos. Saque alternado cada 2 puntos.',
-      formats: [
-        { value: '11-points' as Format, label: '11 puntos' },
-        { value: '21-points' as Format, label: '21 puntos' },
-      ],
-    },
-    {
-      id: 'squash',
-      name: 'Squash',
-      description: 'Juego rápido a 11 puntos bajo regla PAR. Cualquiera puede anotar.',
-      formats: [
-        { value: '11-points' as Format, label: '11 puntos' },
-      ],
-    },
-    {
-      id: 'tennis',
-      name: 'Tenis',
-      description: 'Juego de sets, juegos y desempates. Clásico con lógica de ventaja.',
-      formats: [
-        { value: 'best-of-3' as Format, label: 'Mejor de 3' },
-        { value: 'best-of-5' as Format, label: 'Mejor de 5' },
-      ],
-    },
-  ];
+  const selected = SPORTS.find((s) => s.id === selectedId) || null;
 
   return (
     <div className="sb-select min-h-screen" style={{ backgroundColor: 'var(--sb-bg)' }}>
-      {/* Ambient background gradient */}
+      {/* Ambient tint matching the selected sport */}
       <div
-        className="fixed inset-0 pointer-events-none"
+        className="fixed inset-0 pointer-events-none transition-colors duration-500"
         style={{
-          background: 'radial-gradient(circle at 25% 75%, rgba(191, 144, 84, 0.03) 0%, transparent 50%)',
-          animation: 'drift 20s ease-in-out infinite',
+          background: selected
+            ? `radial-gradient(circle at 50% 20%, ${hexToRgba(SPORT_COLOR[selected.id], 0.16)} 0%, transparent 60%)`
+            : 'transparent',
         }}
       />
 
       <div className="relative z-10 flex min-h-screen flex-col px-6 py-16 md:px-12">
         {/* Header */}
-        <div className="mb-20 text-center">
+        <div className="mb-14 text-center">
           <h1
-            className="mb-4 text-5xl md:text-6xl font-light"
+            className="mb-2 text-5xl md:text-6xl font-light"
             style={{
               fontFamily: "'Instrument Serif', 'Newsreader', serif",
               color: 'var(--sb-text)',
@@ -108,160 +81,86 @@ export function SportSelector({ onSelectSport }: SportSelectorProps) {
           >
             Elige tu deporte
           </h1>
-          <p
-            className="text-lg"
-            style={{
-              color: 'var(--sb-text-secondary)',
-              fontFamily: "'Geist Sans', sans-serif",
-              lineHeight: '1.6',
-            }}
-          >
-            Selecciona el deporte y el formato que deseas jugar
-          </p>
         </div>
 
-        {quickContinue && (
-          <div className="mx-auto mb-10 w-full max-w-5xl">
-            <button
-              onClick={() => onSelectSport(quickContinue.sport, quickContinue.format)}
-              className="w-full transition-all duration-200 active:scale-95"
-              style={{
-                backgroundColor: 'var(--sb-button-bg)',
-                color: 'var(--sb-button-text)',
-                padding: '18px 24px',
-                borderRadius: '10px',
-                border: 'none',
-                fontFamily: "'Geist Sans', sans-serif",
-                fontSize: '16px',
-                fontWeight: '600',
-                letterSpacing: '0.01em',
-                cursor: 'pointer',
-                textAlign: 'left',
-              }}
-              type="button"
-            >
-              ▶ Continuar: {quickContinue.sportName} · {quickContinue.formatLabel}
-            </button>
-          </div>
-        )}
+        {/* Sport Cards */}
+        <div className="mx-auto w-full max-w-4xl">
+          <div className="grid grid-cols-3 gap-4 md:gap-6">
+            {SPORTS.map((sport) => {
+              const isSelected = sport.id === selectedId;
+              const color = SPORT_COLOR[sport.id];
 
-        {/* Sports Grid - Asymmetric Bento */}
-        <div className="mx-auto w-full max-w-5xl">
-          <div
-            className="grid gap-6 md:gap-8"
-            style={{
-              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-            }}
-          >
-            {sports.map((sport, index) => (
-              <div
-                key={sport.id}
-                data-animate
-                className="opacity-0 translate-y-3"
-                style={{
-                  animation: `slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards`,
-                  animationDelay: `${index * 100}ms`,
-                }}
-              >
-                <div
-                  className="group h-full flex flex-col p-8 transition-all duration-200 hover:shadow-sm"
+              return (
+                <button
+                  key={sport.id}
+                  onClick={() => setSelectedId(sport.id)}
+                  type="button"
+                  className="flex flex-col items-center justify-center gap-2 rounded-2xl p-6 transition-all duration-300 active:scale-95 md:p-10"
                   style={{
-                    backgroundColor: 'var(--sb-card-bg)',
-                    border: '1px solid var(--sb-card-border)',
-                    borderRadius: '12px',
-                    boxShadow: '0 0 0 0 rgba(0, 0, 0, 0)',
-                  }}
-                  onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLDivElement).style.boxShadow =
-                      '0 2px 8px rgba(0, 0, 0, 0.04)';
-                  }}
-                  onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLDivElement).style.boxShadow =
-                      '0 0 0 0 rgba(0, 0, 0, 0)';
+                    backgroundColor: isSelected ? color : 'var(--sb-card-bg)',
+                    border: `2px solid ${isSelected ? color : 'var(--sb-card-border)'}`,
+                    boxShadow: isSelected ? `0 8px 30px ${hexToRgba(color, 0.4)}` : 'none',
+                    transform: isSelected ? 'scale(1.04)' : 'scale(1)',
                   }}
                 >
-                  {/* Sport Name */}
-                  <h2
-                    className="mb-3 text-2xl font-medium"
+                  <span style={{ fontSize: 'clamp(2.5rem, 8vw, 4rem)', lineHeight: 1 }}>
+                    {SPORT_ICON[sport.id]}
+                  </span>
+                  <span
+                    className="text-sm font-semibold md:text-base"
                     style={{
-                      fontFamily: "'Instrument Serif', serif",
-                      color: 'var(--sb-text)',
-                      letterSpacing: '-0.01em',
-                    }}
-                  >
-                    {sport.name}
-                  </h2>
-
-                  {/* Description */}
-                  <p
-                    className="mb-8 flex-grow text-sm leading-relaxed"
-                    style={{
-                      color: 'var(--sb-text-secondary)',
+                      color: isSelected ? '#FFFFFF' : 'var(--sb-text)',
                       fontFamily: "'Geist Sans', sans-serif",
-                      lineHeight: '1.6',
                     }}
                   >
-                    {sport.description}
-                  </p>
-
-                  {/* Format Buttons */}
-                  <div className="space-y-3">
-                    {sport.formats.map((format) => (
-                      <button
-                        key={format.value}
-                        onClick={() => onSelectSport(sport.id as Sport, format.value)}
-                        className="w-full transition-all duration-200 active:scale-95"
-                        style={{
-                          backgroundColor: 'var(--sb-button-bg)',
-                          color: 'var(--sb-button-text)',
-                          padding: '12px 16px',
-                          borderRadius: '6px',
-                          border: 'none',
-                          fontFamily: "'Geist Sans', sans-serif",
-                          fontSize: '14px',
-                          fontWeight: '500',
-                          letterSpacing: '0.02em',
-                          cursor: 'pointer',
-                        }}
-                        onMouseEnter={(e) => {
-                          (e.currentTarget as HTMLButtonElement).style.backgroundColor =
-                            'var(--sb-button-bg-hover)';
-                        }}
-                        onMouseLeave={(e) => {
-                          (e.currentTarget as HTMLButtonElement).style.backgroundColor =
-                            'var(--sb-button-bg)';
-                        }}
-                        type="button"
-                      >
-                        {format.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            ))}
+                    {SPORT_NAME[sport.id]}
+                  </span>
+                </button>
+              );
+            })}
           </div>
+
+          {/* Format picker for the selected sport */}
+          {selected && (
+            <div
+              className="mx-auto mt-8 flex max-w-md flex-wrap justify-center gap-3"
+              style={{ animation: 'formatsIn 0.3s ease forwards' }}
+            >
+              {selected.formats.map((format) => (
+                <button
+                  key={format.value}
+                  onClick={() => onSelectSport(selected.id, format.value)}
+                  type="button"
+                  className="transition-all duration-200 active:scale-95"
+                  style={{
+                    backgroundColor: SPORT_COLOR[selected.id],
+                    color: '#FFFFFF',
+                    padding: '14px 28px',
+                    borderRadius: '10px',
+                    border: 'none',
+                    fontFamily: "'Geist Sans', sans-serif",
+                    fontSize: '15px',
+                    fontWeight: '600',
+                    letterSpacing: '0.01em',
+                    cursor: 'pointer',
+                  }}
+                >
+                  {format.label}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Footer hint */}
-        <div className="mt-16 text-center">
+        <div className="mt-auto pt-16 text-center">
           <button
             onClick={() => setShowStandings(true)}
-            className="mb-3 text-sm transition-opacity hover:opacity-70"
+            className="text-sm transition-opacity hover:opacity-70"
             style={{ color: 'var(--sb-text-secondary)', fontFamily: "'Geist Sans', sans-serif" }}
           >
             🏆 Tabla de sesión
           </button>
-          <p
-            className="text-xs"
-            style={{
-              color: 'var(--sb-text-faint)',
-              fontFamily: "'Geist Mono', monospace",
-              letterSpacing: '0.05em',
-            }}
-          >
-            Desarrollado con precisión
-          </p>
         </div>
       </div>
 
@@ -275,9 +174,6 @@ export function SportSelector({ onSelectSport }: SportSelectorProps) {
           --sb-text-faint: #EAEAEA;
           --sb-card-bg: #FFFFFF;
           --sb-card-border: #EAEAEA;
-          --sb-button-bg: #111111;
-          --sb-button-bg-hover: #333333;
-          --sb-button-text: #FFFFFF;
         }
 
         @media (prefers-color-scheme: dark) {
@@ -288,40 +184,12 @@ export function SportSelector({ onSelectSport }: SportSelectorProps) {
             --sb-text-faint: #333333;
             --sb-card-bg: #161616;
             --sb-card-border: #2A2A2A;
-            --sb-button-bg: #F5F5F5;
-            --sb-button-bg-hover: #FFFFFF;
-            --sb-button-text: #111111;
           }
         }
 
-        @keyframes slideUp {
-          from {
-            opacity: 0;
-            transform: translateY(12px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        @keyframes drift {
-          0%, 100% {
-            transform: translate(0, 0);
-          }
-          25% {
-            transform: translate(20px, -20px);
-          }
-          50% {
-            transform: translate(0, 20px);
-          }
-          75% {
-            transform: translate(-20px, -10px);
-          }
-        }
-
-        [data-animate].animate-in {
-          animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        @keyframes formatsIn {
+          from { opacity: 0; transform: translateY(-8px); }
+          to { opacity: 1; transform: translateY(0); }
         }
 
         @supports (font-variation-settings: normal) {

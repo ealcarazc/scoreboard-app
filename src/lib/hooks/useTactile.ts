@@ -66,7 +66,9 @@ export function useTactile() {
     playBeep(200, 80);
   };
 
-  // Short celebratory ascending arpeggio for a double-tap "Ace" point
+  // Short stadium-ovation swell (noise bed + bright blips) for a
+  // double-tap "Ace" point. Must run synchronously inside the tap
+  // handler (no async gap) so iOS Safari's autoplay gate allows it.
   const aceFeedback = () => {
     vibrate([40, 40, 40, 40, 90]);
     const ctx = getAudioContext();
@@ -77,26 +79,55 @@ export function useTactile() {
         ctx.resume().catch(() => {});
       }
 
-      const notes = [440, 554.37, 659.25, 880]; // A4, C#5, E5, A5
-      const noteDuration = 0.09;
+      const now = ctx.currentTime;
+      const duration = 1.0;
 
-      notes.forEach((freq, i) => {
-        const start = ctx.currentTime + i * noteDuration;
+      // Crowd-roar noise bed, band-passed and shaped with a quick swell + fade
+      const bufferSize = Math.floor(ctx.sampleRate * duration);
+      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = (Math.random() * 2 - 1) * 0.7;
+      }
+
+      const noise = ctx.createBufferSource();
+      noise.buffer = buffer;
+
+      const bandpass = ctx.createBiquadFilter();
+      bandpass.type = 'bandpass';
+      bandpass.frequency.value = 1100;
+      bandpass.Q.value = 0.5;
+
+      const noiseGain = ctx.createGain();
+      noiseGain.gain.setValueAtTime(0.0001, now);
+      noiseGain.gain.exponentialRampToValueAtTime(0.35, now + 0.12);
+      noiseGain.gain.exponentialRampToValueAtTime(0.16, now + 0.55);
+      noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+      noise.connect(bandpass);
+      bandpass.connect(noiseGain);
+      noiseGain.connect(ctx.destination);
+      noise.start(now);
+      noise.stop(now + duration);
+
+      // A few bright celebratory blips layered on top
+      [660, 880, 1046.5].forEach((freq, i) => {
+        const start = now + i * 0.08;
         const oscillator = ctx.createOscillator();
         const gainNode = ctx.createGain();
 
         oscillator.connect(gainNode);
         gainNode.connect(ctx.destination);
 
-        oscillator.frequency.value = freq;
         oscillator.type = 'triangle';
+        oscillator.frequency.value = freq;
 
-        gainNode.gain.setValueAtTime(0.001, start);
-        gainNode.gain.exponentialRampToValueAtTime(0.25, start + 0.01);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, start + noteDuration);
+        gainNode.gain.setValueAtTime(0.0001, start);
+        gainNode.gain.exponentialRampToValueAtTime(0.2, start + 0.02);
+        gainNode.gain.exponentialRampToValueAtTime(0.0001, start + 0.2);
 
         oscillator.start(start);
-        oscillator.stop(start + noteDuration);
+        oscillator.stop(start + 0.22);
       });
     } catch (e) {
       console.debug('Ace audio playback error:', e);

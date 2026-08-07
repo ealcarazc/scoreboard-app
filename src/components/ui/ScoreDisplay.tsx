@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useRef, useState } from 'react';
+import type { Sport } from '@/types';
+import { SERVE_ICON } from '@/lib/sportIcons';
 
 // Fluid font-size that also accounts for text length, so wider strings
 // like "DEUCE" or "AD" shrink to fit instead of overflowing their panel.
@@ -13,6 +15,7 @@ function scoreFontSize(score: number | string): string {
 const DOUBLE_TAP_WINDOW_MS = 300;
 
 interface ScoreDisplayProps {
+  sport: Sport;
   p1Name: string;
   p2Name: string;
   p1Score: number | string;
@@ -32,6 +35,7 @@ interface ScoreDisplayProps {
 }
 
 export function ScoreDisplay({
+  sport,
   p1Name,
   p2Name,
   p1Score,
@@ -132,7 +136,7 @@ export function ScoreDisplay({
           </h2>
           {p1Serving && (
             <div className="drop-shadow-lg" style={{ fontSize: 'clamp(2rem, 14cqmin, 6rem)', lineHeight: '1.2' }}>
-              🎾
+              {SERVE_ICON[sport]}
             </div>
           )}
           {subtitle1 && (
@@ -185,7 +189,7 @@ export function ScoreDisplay({
           </h2>
           {p2Serving && (
             <div className="drop-shadow-lg" style={{ fontSize: 'clamp(2rem, 14cqmin, 6rem)', lineHeight: '1.2' }}>
-              🎾
+              {SERVE_ICON[sport]}
             </div>
           )}
           {subtitle2 && (

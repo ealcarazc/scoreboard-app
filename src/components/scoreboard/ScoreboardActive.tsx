@@ -118,6 +118,7 @@ export function ScoreboardActive({ match, onAddPoint, onUndo, onReset, onNewMatc
     <div className="flex h-[100dvh] w-screen flex-col overflow-hidden bg-black">
       <div className="min-h-0 flex-1">
         <ScoreDisplay
+          sport={match.sport}
           p1Name={match.players.p1.name}
           p2Name={match.players.p2.name}
           p1Score={p1Score}

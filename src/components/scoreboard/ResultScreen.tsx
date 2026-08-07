@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import type { Match, PlayerInfo } from '@/types';
 import { recordMatchResult, type SessionStats } from '@/lib/sessionStats';
 import { getRecentPairs, type RecentPair } from '@/lib/recentPairs';
+import { recordSeriesResult, type SeriesResult } from '@/lib/seriesTracker';
 
 interface ResultScreenProps {
   match: Match;
@@ -17,10 +18,19 @@ export function ResultScreen({ match, onNewMatch, onBackToMenu, onRematchWithPai
   const loser = match.result === 'p1_win' ? match.players.p2 : match.players.p1;
   const [stats, setStats] = useState<SessionStats>({});
   const [recentPairs, setRecentPairs] = useState<RecentPair[]>([]);
+  const [series, setSeries] = useState<SeriesResult | null>(null);
 
   useEffect(() => {
     const updated = recordMatchResult(winner.name, loser.name);
     setStats(updated);
+
+    const seriesResult = recordSeriesResult(
+      match.players.p1.name,
+      match.players.p2.name,
+      match.sport,
+      winner.name
+    );
+    setSeries(seriesResult);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [winner.name, loser.name, match.result]);
 
@@ -64,7 +74,26 @@ export function ResultScreen({ match, onNewMatch, onBackToMenu, onRematchWithPai
         </div>
       </div>
 
-      <p className="mb-8 text-2xl">Duración: {Math.round((match.endTime?.getTime()! - match.startTime.getTime()) / 60000)} minutos</p>
+      <p className="mb-4 text-2xl">Duración: {Math.round((match.endTime?.getTime()! - match.startTime.getTime()) / 60000)} minutos</p>
+
+      {/* Series tracking */}
+      {series && (
+        series.clinched ? (
+          <div
+            className="mb-8 rounded-xl bg-yellow-500/20 px-6 py-4 text-center"
+            style={{ animation: 'seriesWinPulse 1s ease-in-out infinite' }}
+          >
+            <p className="text-2xl font-black">
+              🏆🏆 ¡{series.seriesWinnerName} ganó la serie! 🏆🏆
+            </p>
+            <p className="text-sm text-white/80">{series.seriesFormat} · {series.state.p1Name} {series.state.p1Wins}-{series.state.p2Wins} {series.state.p2Name}</p>
+          </div>
+        ) : (
+          <p className="mb-8 text-sm text-white/70">
+            Va {series.state.p1Wins}-{series.state.p2Wins} en la serie ({series.state.p1Name} vs {series.state.p2Name})
+          </p>
+        )
+      )}
 
       {/* Session standings */}
       <div className="mb-8 text-center">
@@ -123,6 +152,11 @@ export function ResultScreen({ match, onNewMatch, onBackToMenu, onRematchWithPai
           0% { transform: scale(0) rotate(-15deg); opacity: 0; }
           60% { transform: scale(1.2) rotate(8deg); opacity: 1; }
           100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+
+        @keyframes seriesWinPulse {
+          0%, 100% { transform: scale(1); box-shadow: 0 0 0 rgba(234, 179, 8, 0); }
+          50% { transform: scale(1.03); box-shadow: 0 0 30px rgba(234, 179, 8, 0.6); }
         }
       `}</style>
     </div>

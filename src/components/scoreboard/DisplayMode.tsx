@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import type { Match } from '@/types';
 import { isMatchPoint } from '@/game/matchPoint';
 import { getSessionStats, getSessionLeaders } from '@/lib/sessionStats';
+import { SERVE_ICON } from '@/lib/sportIcons';
 
 // Fluid font-size that also accounts for text length, so wider strings
 // like "DEUCE" or "AD" shrink to fit instead of overflowing their panel.
@@ -127,7 +128,7 @@ export function DisplayMode({}: DisplayModeProps) {
           </h2>
           {p1Serving && (
             <div className="drop-shadow-lg" style={{ fontSize: 'clamp(2.5rem, 14cqmin, 7rem)', lineHeight: '1.2' }}>
-              🎾
+              {SERVE_ICON[match.sport]}
             </div>
           )}
           {subtitle1 && (
@@ -168,7 +169,7 @@ export function DisplayMode({}: DisplayModeProps) {
           </h2>
           {p2Serving && (
             <div className="drop-shadow-lg" style={{ fontSize: 'clamp(2.5rem, 14cqmin, 7rem)', lineHeight: '1.2' }}>
-              🎾
+              {SERVE_ICON[match.sport]}
             </div>
           )}
           {subtitle2 && (
