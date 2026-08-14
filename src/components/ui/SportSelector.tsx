@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import type { Sport, Format } from '@/types';
 import { SessionStandingsModal } from '@/components/scoreboard/SessionStandingsModal';
+import { DriveSyncStatus } from '@/components/ui/DriveSyncStatus';
 import { SPORT_ICON, SPORT_COLOR, SPORT_NAME } from '@/lib/sportIcons';
 
 interface SportSelectorProps {
@@ -153,7 +154,7 @@ export function SportSelector({ onSelectSport }: SportSelectorProps) {
         </div>
 
         {/* Footer hint */}
-        <div className="mt-auto pt-16 text-center">
+        <div className="mt-auto flex flex-col items-center gap-3 pt-16 text-center">
           <button
             onClick={() => setShowStandings(true)}
             className="text-sm transition-opacity hover:opacity-70"
@@ -161,6 +162,7 @@ export function SportSelector({ onSelectSport }: SportSelectorProps) {
           >
             🏆 Tabla de sesión
           </button>
+          <DriveSyncStatus />
         </div>
       </div>
 

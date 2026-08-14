@@ -8,6 +8,8 @@ import { useMatch } from '@/lib/hooks/useMatch';
 import { saveRecentPair, clearRecentPairs } from '@/lib/recentPairs';
 import { resetSessionStats } from '@/lib/sessionStats';
 import { clearSeriesState } from '@/lib/seriesTracker';
+import { clearMatchHistory } from '@/lib/matchHistory';
+import { pushToDrive } from '@/lib/driveSync';
 import type { PlayerInfo, Sport, Format } from '@/types';
 
 type AppState = 'sport-select' | 'player-select' | 'playing';
@@ -73,6 +75,7 @@ export default function Home() {
   const handleResetSession = () => {
     resetMatch();
     resetSessionStats();
+    pushToDrive();
   };
 
   const handleResetAll = () => {
@@ -80,11 +83,13 @@ export default function Home() {
     resetSessionStats();
     clearRecentPairs();
     clearSeriesState();
+    clearMatchHistory();
     localStorage.removeItem('lastSport');
     localStorage.removeItem('lastFormat');
     setAppState('sport-select');
     setSelectedSport(null);
     setSelectedFormat(null);
+    pushToDrive();
   };
 
   if (appState === 'sport-select') {

@@ -5,6 +5,8 @@ import type { Match, PlayerInfo } from '@/types';
 import { recordMatchResult, revertMatchResult, type SessionStats } from '@/lib/sessionStats';
 import { getRecentPairs, type RecentPair } from '@/lib/recentPairs';
 import { recordSeriesResult, revertSeriesResult, type SeriesResult } from '@/lib/seriesTracker';
+import { addMatchHistoryEntry, removeLastMatchHistoryEntry } from '@/lib/matchHistory';
+import { pushToDrive } from '@/lib/driveSync';
 
 interface ResultScreenProps {
   match: Match;
@@ -32,6 +34,22 @@ export function ResultScreen({ match, onNewMatch, onBackToMenu, onRematchWithPai
       winner.name
     );
     setSeries(seriesResult);
+
+    const score =
+      match.sport === 'tennis'
+        ? `Sets ${match.currentSets.p1}-${match.currentSets.p2}`
+        : `${match.currentPoints.p1}-${match.currentPoints.p2}`;
+
+    addMatchHistoryEntry({
+      date: new Date().toISOString().slice(0, 10),
+      sport: match.sport,
+      player1: match.players.p1.name,
+      player2: match.players.p2.name,
+      winner: winner.name,
+      score,
+    });
+
+    pushToDrive();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [winner.name, loser.name, match.result]);
 
@@ -59,6 +77,8 @@ export function ResultScreen({ match, onNewMatch, onBackToMenu, onRematchWithPai
     if (series) {
       revertSeriesResult(series.state, winner.name);
     }
+    removeLastMatchHistoryEntry();
+    pushToDrive();
     onUndoLastPoint();
   };
 
