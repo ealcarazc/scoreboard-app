@@ -5,6 +5,7 @@ import React, { useState } from 'react';
 interface ResetModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onExitToMenu: () => void;
   onResetMatch: () => void;
   onResetSession: () => void;
   onResetAll: () => void;
@@ -21,7 +22,14 @@ const LEVEL_INFO: Record<Level, { title: string; desc: string }> = {
   },
 };
 
-export function ResetModal({ isOpen, onClose, onResetMatch, onResetSession, onResetAll }: ResetModalProps) {
+export function ResetModal({
+  isOpen,
+  onClose,
+  onExitToMenu,
+  onResetMatch,
+  onResetSession,
+  onResetAll,
+}: ResetModalProps) {
   const [pending, setPending] = useState<Level | null>(null);
 
   if (!isOpen) return null;
@@ -29,6 +37,12 @@ export function ResetModal({ isOpen, onClose, onResetMatch, onResetSession, onRe
   const handleClose = () => {
     setPending(null);
     onClose();
+  };
+
+  const handleExit = () => {
+    setPending(null);
+    onClose();
+    onExitToMenu();
   };
 
   const handleConfirm = () => {
@@ -52,6 +66,16 @@ export function ResetModal({ isOpen, onClose, onResetMatch, onResetSession, onRe
           <>
             <h2 className="mb-4 text-center text-lg font-bold">Reset</h2>
             <div className="space-y-2">
+              <button
+                onClick={handleExit}
+                className="w-full rounded-lg bg-blue-900/50 px-4 py-3 text-left transition-all hover:bg-blue-900/70 active:scale-[0.98]"
+              >
+                <p className="font-semibold">🚪 Salir al menú</p>
+                <p className="text-xs text-blue-200">No borra nada — solo sales del partido actual</p>
+              </button>
+
+              <div className="my-3 border-t border-gray-700" />
+
               <button
                 onClick={() => setPending('match')}
                 className="w-full rounded-lg bg-gray-700 px-4 py-3 text-left transition-all hover:bg-gray-600 active:scale-[0.98]"

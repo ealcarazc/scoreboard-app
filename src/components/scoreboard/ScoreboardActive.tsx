@@ -19,7 +19,7 @@ interface ScoreboardActiveProps {
   onResetSession: () => void;
   onResetAll: () => void;
   onNewMatch?: () => void;
-  onBackToMenu?: () => void;
+  onBackToMenu: () => void;
   onSwapPlayers?: () => void;
   onRematchWithPair?: (p1: Match['players']['p1'], p2: Match['players']['p2']) => void;
 }
@@ -152,6 +152,7 @@ export function ScoreboardActive({
         />
       </div>
       <ControlPanel
+        onExitToMenu={onBackToMenu}
         onResetMatch={onResetMatch}
         onResetSession={onResetSession}
         onResetAll={onResetAll}

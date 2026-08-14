@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { ResetModal } from './ResetModal';
 
 interface ControlPanelProps {
+  onExitToMenu: () => void;
   onResetMatch: () => void;
   onResetSession: () => void;
   onResetAll: () => void;
@@ -15,6 +16,7 @@ interface ControlPanelProps {
 }
 
 export function ControlPanel({
+  onExitToMenu,
   onResetMatch,
   onResetSession,
   onResetAll,
@@ -75,6 +77,7 @@ export function ControlPanel({
       <ResetModal
         isOpen={showResetModal}
         onClose={() => setShowResetModal(false)}
+        onExitToMenu={onExitToMenu}
         onResetMatch={onResetMatch}
         onResetSession={onResetSession}
         onResetAll={onResetAll}
