@@ -101,7 +101,10 @@ export function useMatch() {
       return {
         ...prev,
         currentPoints: previousState.currentPoints,
+        currentGames: previousState.currentGames,
+        currentSets: previousState.currentSets,
         currentServer: previousState.currentServer,
+        isInTiebreak: previousState.isInTiebreak,
         result: undefined,
         endTime: undefined,
         history: prev.history.slice(0, -1),

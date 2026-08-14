@@ -5,7 +5,9 @@ import { SportSelector } from '@/components/ui/SportSelector';
 import { PlayerSelector } from '@/components/ui/PlayerSelector';
 import { ScoreboardActive } from '@/components/scoreboard/ScoreboardActive';
 import { useMatch } from '@/lib/hooks/useMatch';
-import { saveRecentPair } from '@/lib/recentPairs';
+import { saveRecentPair, clearRecentPairs } from '@/lib/recentPairs';
+import { resetSessionStats } from '@/lib/sessionStats';
+import { clearSeriesState } from '@/lib/seriesTracker';
 import type { PlayerInfo, Sport, Format } from '@/types';
 
 type AppState = 'sport-select' | 'player-select' | 'playing';
@@ -64,8 +66,22 @@ export default function Home() {
     setSelectedFormat(null);
   };
 
-  const handleReset = () => {
+  const handleResetMatch = () => {
     resetMatch();
+  };
+
+  const handleResetSession = () => {
+    resetMatch();
+    resetSessionStats();
+  };
+
+  const handleResetAll = () => {
+    resetMatch();
+    resetSessionStats();
+    clearRecentPairs();
+    clearSeriesState();
+    localStorage.removeItem('lastSport');
+    localStorage.removeItem('lastFormat');
     setAppState('sport-select');
     setSelectedSport(null);
     setSelectedFormat(null);
@@ -88,7 +104,9 @@ export default function Home() {
       match={match}
       onAddPoint={addPoint}
       onUndo={undo}
-      onReset={handleReset}
+      onResetMatch={handleResetMatch}
+      onResetSession={handleResetSession}
+      onResetAll={handleResetAll}
       onNewMatch={handleNewMatch}
       onBackToMenu={handleBackToMenu}
       onSwapPlayers={swapPlayers}

@@ -2,18 +2,19 @@
 
 import React, { useEffect, useState } from 'react';
 import type { Match, PlayerInfo } from '@/types';
-import { recordMatchResult, type SessionStats } from '@/lib/sessionStats';
+import { recordMatchResult, revertMatchResult, type SessionStats } from '@/lib/sessionStats';
 import { getRecentPairs, type RecentPair } from '@/lib/recentPairs';
-import { recordSeriesResult, type SeriesResult } from '@/lib/seriesTracker';
+import { recordSeriesResult, revertSeriesResult, type SeriesResult } from '@/lib/seriesTracker';
 
 interface ResultScreenProps {
   match: Match;
   onNewMatch: () => void;
   onBackToMenu: () => void;
   onRematchWithPair?: (p1: PlayerInfo, p2: PlayerInfo) => void;
+  onUndoLastPoint: () => void;
 }
 
-export function ResultScreen({ match, onNewMatch, onBackToMenu, onRematchWithPair }: ResultScreenProps) {
+export function ResultScreen({ match, onNewMatch, onBackToMenu, onRematchWithPair, onUndoLastPoint }: ResultScreenProps) {
   const winner = match.result === 'p1_win' ? match.players.p1 : match.players.p2;
   const loser = match.result === 'p1_win' ? match.players.p2 : match.players.p1;
   const [stats, setStats] = useState<SessionStats>({});
@@ -53,8 +54,24 @@ export function ResultScreen({ match, onNewMatch, onBackToMenu, onRematchWithPai
     onRematchWithPair(p1, p2);
   };
 
+  const handleUndoWinner = () => {
+    revertMatchResult(winner.name, loser.name);
+    if (series) {
+      revertSeriesResult(series.state, winner.name);
+    }
+    onUndoLastPoint();
+  };
+
   return (
-    <div className="flex h-screen w-screen flex-col items-center justify-center overflow-y-auto bg-gradient-to-b from-green-600 to-green-900 p-6 text-white">
+    <div className="relative flex h-screen w-screen flex-col items-center justify-center overflow-y-auto bg-gradient-to-b from-green-600 to-green-900 p-6 text-white">
+      <button
+        onClick={handleUndoWinner}
+        className="absolute left-4 top-4 z-10 flex items-center gap-1 rounded-full bg-black/25 px-3 py-2 text-xs font-semibold text-white/90 transition-all hover:bg-black/40 active:scale-95"
+        title="Deshacer: fue un error, no ganó el partido"
+      >
+        ↩️ Deshacer
+      </button>
+
       <div className="mb-4 text-8xl" style={{ animation: 'trophyBounce 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)' }}>
         🏆
       </div>
@@ -90,7 +107,7 @@ export function ResultScreen({ match, onNewMatch, onBackToMenu, onRematchWithPai
           </div>
         ) : (
           <p className="mb-8 text-sm text-white/70">
-            Va {series.state.p1Wins}-{series.state.p2Wins} en la serie ({series.state.p1Name} vs {series.state.p2Name})
+            Serie: {series.state.p1Name} {series.state.p1Wins} — {series.state.p2Name} {series.state.p2Wins}
           </p>
         )
       )}

@@ -35,6 +35,23 @@ export function resetSessionStats() {
   localStorage.removeItem(KEY);
 }
 
+// Reverses a previously recorded result (used when undoing a match
+// declared over by mistake, e.g. a bad Match Point tap).
+export function revertMatchResult(winnerName: string, loserName: string): SessionStats {
+  const stats = getSessionStats();
+
+  if (stats[winnerName]) {
+    stats[winnerName].wins = Math.max(0, stats[winnerName].wins - 1);
+    stats[winnerName].matches = Math.max(0, stats[winnerName].matches - 1);
+  }
+  if (stats[loserName]) {
+    stats[loserName].matches = Math.max(0, stats[loserName].matches - 1);
+  }
+
+  localStorage.setItem(KEY, JSON.stringify(stats));
+  return stats;
+}
+
 // Names with the highest win count in the session (empty if nobody has won yet)
 export function getSessionLeaders(stats: SessionStats): string[] {
   const entries = Object.entries(stats).filter(([, s]) => s.wins > 0);

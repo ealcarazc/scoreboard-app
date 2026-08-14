@@ -123,11 +123,11 @@ export function DisplayMode({}: DisplayModeProps) {
         )}
         <div className="relative z-10 text-center">
           <h2 className="font-bold text-white drop-shadow-lg" style={{ fontSize: 'clamp(1.5rem, min(8cqw, 8cqh), 4.5rem)' }}>
-            {p1Leader && '🏆 '}
+            {p1Leader && <span style={{ fontSize: '0.6em' }}>🏆 </span>}
             {match.players.p1.name}
           </h2>
           {p1Serving && (
-            <div className="drop-shadow-lg" style={{ fontSize: 'clamp(2.5rem, 14cqmin, 7rem)', lineHeight: '1.2' }}>
+            <div className="drop-shadow-lg" style={{ fontSize: 'clamp(2.75rem, 16cqmin, 7.5rem)', lineHeight: '1.2' }}>
               {SERVE_ICON[match.sport]}
             </div>
           )}
@@ -164,11 +164,11 @@ export function DisplayMode({}: DisplayModeProps) {
         )}
         <div className="relative z-10 text-center">
           <h2 className="font-bold text-white drop-shadow-lg" style={{ fontSize: 'clamp(1.5rem, min(8cqw, 8cqh), 4.5rem)' }}>
-            {p2Leader && '🏆 '}
+            {p2Leader && <span style={{ fontSize: '0.6em' }}>🏆 </span>}
             {match.players.p2.name}
           </h2>
           {p2Serving && (
-            <div className="drop-shadow-lg" style={{ fontSize: 'clamp(2.5rem, 14cqmin, 7rem)', lineHeight: '1.2' }}>
+            <div className="drop-shadow-lg" style={{ fontSize: 'clamp(2.75rem, 16cqmin, 7.5rem)', lineHeight: '1.2' }}>
               {SERVE_ICON[match.sport]}
             </div>
           )}

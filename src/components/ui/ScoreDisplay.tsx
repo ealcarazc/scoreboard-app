@@ -13,6 +13,7 @@ function scoreFontSize(score: number | string): string {
 }
 
 const DOUBLE_TAP_WINDOW_MS = 300;
+const ACE_FLASH_MS = 700;
 
 interface ScoreDisplayProps {
   sport: Sport;
@@ -55,6 +56,8 @@ export function ScoreDisplay({
 }: ScoreDisplayProps) {
   const [flashP1, setFlashP1] = useState(false);
   const [flashP2, setFlashP2] = useState(false);
+  const [aceFlashP1, setAceFlashP1] = useState(false);
+  const [aceFlashP2, setAceFlashP2] = useState(false);
 
   const p1LastTap = useRef(0);
   const p1PendingTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -71,6 +74,8 @@ export function ScoreDisplay({
         clearTimeout(p1PendingTimer.current);
         p1PendingTimer.current = null;
       }
+      setAceFlashP1(true);
+      setTimeout(() => setAceFlashP1(false), ACE_FLASH_MS);
       onTapP1(true);
     } else {
       p1PendingTimer.current = setTimeout(() => {
@@ -91,6 +96,8 @@ export function ScoreDisplay({
         clearTimeout(p2PendingTimer.current);
         p2PendingTimer.current = null;
       }
+      setAceFlashP2(true);
+      setTimeout(() => setAceFlashP2(false), ACE_FLASH_MS);
       onTapP2(true);
     } else {
       p2PendingTimer.current = setTimeout(() => {
@@ -126,16 +133,27 @@ export function ScoreDisplay({
           </div>
         )}
 
+        {aceFlashP1 && (
+          <div className="absolute left-1/2 top-[4%] -translate-x-1/2 z-20">
+            <span
+              className="ace-badge inline-block whitespace-nowrap rounded-full bg-white/90 px-5 py-2 font-black uppercase text-black drop-shadow-lg"
+              style={{ fontSize: 'clamp(1.25rem, 9cqw, 3.5rem)', letterSpacing: '0.03em' }}
+            >
+              ⚡ Ace!
+            </span>
+          </div>
+        )}
+
         <div className="relative z-10 text-center">
           <h2
             className="font-bold text-white drop-shadow-lg"
             style={{ fontSize: 'clamp(1.25rem, min(8cqw, 8cqh), 3.5rem)' }}
           >
-            {p1SessionLeader && '🏆 '}
+            {p1SessionLeader && <span style={{ fontSize: '0.6em' }}>🏆 </span>}
             {p1Name}
           </h2>
           {p1Serving && (
-            <div className="drop-shadow-lg" style={{ fontSize: 'clamp(2rem, 14cqmin, 6rem)', lineHeight: '1.2' }}>
+            <div className="drop-shadow-lg" style={{ fontSize: 'clamp(2.25rem, 16cqmin, 6.5rem)', lineHeight: '1.2' }}>
               {SERVE_ICON[sport]}
             </div>
           )}
@@ -179,16 +197,27 @@ export function ScoreDisplay({
           </div>
         )}
 
+        {aceFlashP2 && (
+          <div className="absolute left-1/2 top-[4%] -translate-x-1/2 z-20">
+            <span
+              className="ace-badge inline-block whitespace-nowrap rounded-full bg-white/90 px-5 py-2 font-black uppercase text-black drop-shadow-lg"
+              style={{ fontSize: 'clamp(1.25rem, 9cqw, 3.5rem)', letterSpacing: '0.03em' }}
+            >
+              ⚡ Ace!
+            </span>
+          </div>
+        )}
+
         <div className="relative z-10 text-center">
           <h2
             className="font-bold text-white drop-shadow-lg"
             style={{ fontSize: 'clamp(1.25rem, min(8cqw, 8cqh), 3.5rem)' }}
           >
-            {p2SessionLeader && '🏆 '}
+            {p2SessionLeader && <span style={{ fontSize: '0.6em' }}>🏆 </span>}
             {p2Name}
           </h2>
           {p2Serving && (
-            <div className="drop-shadow-lg" style={{ fontSize: 'clamp(2rem, 14cqmin, 6rem)', lineHeight: '1.2' }}>
+            <div className="drop-shadow-lg" style={{ fontSize: 'clamp(2.25rem, 16cqmin, 6.5rem)', lineHeight: '1.2' }}>
               {SERVE_ICON[sport]}
             </div>
           )}
@@ -217,11 +246,20 @@ export function ScoreDisplay({
           50% { opacity: 0.55; }
         }
 
+        @keyframes aceBadgeIn {
+          0% { opacity: 0; transform: translateX(-50%) scale(0.6); }
+          15% { opacity: 1; transform: translateX(-50%) scale(1.1); }
+          25% { transform: translateX(-50%) scale(1); }
+          80% { opacity: 1; }
+          100% { opacity: 0; }
+        }
+
         .mp-badge { animation: pulseMatchBadge 0.7s ease-in-out infinite; }
         .mp-glow {
           background: radial-gradient(circle at 50% 30%, rgba(255, 215, 0, 0.9) 0%, transparent 70%);
           animation: pulseMatchGlow 0.7s ease-in-out infinite;
         }
+        .ace-badge { animation: aceBadgeIn 0.7s ease-out forwards; }
 
         .sb-panel { flex: 1 1 0; }
 

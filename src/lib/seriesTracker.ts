@@ -82,3 +82,26 @@ export function recordSeriesResult(
 
   return { state, clinched, seriesFormat, seriesWinnerName: clinched ? winnerName : null };
 }
+
+// Reverses the last recorded series win (used when undoing a match
+// declared over by mistake). `postIncrementState` is the SeriesResult.state
+// returned by the recordSeriesResult call being undone.
+export function revertSeriesResult(postIncrementState: SeriesState, winnerName: string) {
+  const reverted: SeriesState = { ...postIncrementState };
+
+  if (winnerName === reverted.p1Name) {
+    reverted.p1Wins = Math.max(0, reverted.p1Wins - 1);
+  } else {
+    reverted.p2Wins = Math.max(0, reverted.p2Wins - 1);
+  }
+
+  if (reverted.p1Wins === 0 && reverted.p2Wins === 0) {
+    localStorage.removeItem(KEY);
+  } else {
+    localStorage.setItem(KEY, JSON.stringify(reverted));
+  }
+}
+
+export function clearSeriesState() {
+  localStorage.removeItem(KEY);
+}

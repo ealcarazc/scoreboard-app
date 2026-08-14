@@ -40,3 +40,7 @@ export function saveRecentPair(p1: PlayerInfo, p2: PlayerInfo) {
 
   localStorage.setItem(KEY, JSON.stringify(updated));
 }
+
+export function clearRecentPairs() {
+  localStorage.removeItem(KEY);
+}

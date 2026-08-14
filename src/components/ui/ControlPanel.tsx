@@ -1,29 +1,30 @@
 'use client';
 
 import React, { useState } from 'react';
+import { ResetModal } from './ResetModal';
 
 interface ControlPanelProps {
-  onReset: () => void;
+  onResetMatch: () => void;
+  onResetSession: () => void;
+  onResetAll: () => void;
   onUndo: () => void;
   canUndo: boolean;
-  gameOver?: boolean;
   onSwap?: () => void;
   onOpenDisplay?: () => void;
   onOpenStandings?: () => void;
 }
 
-export function ControlPanel({ onReset, onUndo, canUndo, gameOver = false, onSwap, onOpenDisplay, onOpenStandings }: ControlPanelProps) {
-  const [showConfirmReset, setShowConfirmReset] = useState(false);
-
-  const handleReset = () => {
-    if (showConfirmReset) {
-      onReset();
-      setShowConfirmReset(false);
-    } else {
-      setShowConfirmReset(true);
-      setTimeout(() => setShowConfirmReset(false), 3000); // Reset confirmation after 3 seconds
-    }
-  };
+export function ControlPanel({
+  onResetMatch,
+  onResetSession,
+  onResetAll,
+  onUndo,
+  canUndo,
+  onSwap,
+  onOpenDisplay,
+  onOpenStandings,
+}: ControlPanelProps) {
+  const [showResetModal, setShowResetModal] = useState(false);
 
   return (
     <div className="w-full flex-none border-t border-gray-600 bg-gray-900 shadow-lg">
@@ -37,15 +38,13 @@ export function ControlPanel({ onReset, onUndo, canUndo, gameOver = false, onSwa
         </button>
 
         <button
-          onClick={handleReset}
-          className={`shrink-0 whitespace-nowrap rounded px-3 py-2 text-sm font-semibold text-white transition-all active:scale-95 ${
-            showConfirmReset ? 'bg-red-700' : 'bg-gray-700 hover:bg-gray-600'
-          }`}
+          onClick={() => setShowResetModal(true)}
+          className="shrink-0 whitespace-nowrap rounded bg-gray-700 px-3 py-2 text-sm font-semibold text-white transition-all active:scale-95 hover:bg-gray-600"
         >
-          {showConfirmReset ? '¿Seguro?' : '🔄 Reset'}
+          🔄 Reset
         </button>
 
-        {!gameOver && onSwap && (
+        {onSwap && (
           <button
             onClick={onSwap}
             className="shrink-0 whitespace-nowrap rounded bg-purple-600 px-3 py-2 text-sm font-semibold text-white transition-all active:scale-95 hover:bg-purple-700"
@@ -54,7 +53,7 @@ export function ControlPanel({ onReset, onUndo, canUndo, gameOver = false, onSwa
           </button>
         )}
 
-        {!gameOver && onOpenDisplay && (
+        {onOpenDisplay && (
           <button
             onClick={onOpenDisplay}
             className="shrink-0 whitespace-nowrap rounded bg-orange-600 px-3 py-2 text-sm font-semibold text-white transition-all active:scale-95 hover:bg-orange-700"
@@ -71,16 +70,15 @@ export function ControlPanel({ onReset, onUndo, canUndo, gameOver = false, onSwa
             🏆 Tabla
           </button>
         )}
-
-        {gameOver && (
-          <button
-            onClick={onReset}
-            className="shrink-0 whitespace-nowrap rounded bg-green-600 px-3 py-2 text-sm font-semibold text-white transition-all active:scale-95 hover:bg-green-700"
-          >
-            ✓ Nuevo Juego
-          </button>
-        )}
       </div>
+
+      <ResetModal
+        isOpen={showResetModal}
+        onClose={() => setShowResetModal(false)}
+        onResetMatch={onResetMatch}
+        onResetSession={onResetSession}
+        onResetAll={onResetAll}
+      />
     </div>
   );
 }

@@ -15,14 +15,27 @@ interface ScoreboardActiveProps {
   match: Match;
   onAddPoint: (player: 'p1' | 'p2') => void;
   onUndo: () => void;
-  onReset: () => void;
+  onResetMatch: () => void;
+  onResetSession: () => void;
+  onResetAll: () => void;
   onNewMatch?: () => void;
   onBackToMenu?: () => void;
   onSwapPlayers?: () => void;
   onRematchWithPair?: (p1: Match['players']['p1'], p2: Match['players']['p2']) => void;
 }
 
-export function ScoreboardActive({ match, onAddPoint, onUndo, onReset, onNewMatch, onBackToMenu, onSwapPlayers, onRematchWithPair }: ScoreboardActiveProps) {
+export function ScoreboardActive({
+  match,
+  onAddPoint,
+  onUndo,
+  onResetMatch,
+  onResetSession,
+  onResetAll,
+  onNewMatch,
+  onBackToMenu,
+  onSwapPlayers,
+  onRematchWithPair,
+}: ScoreboardActiveProps) {
   const [leaders, setLeaders] = useState<string[]>([]);
   const [showStandings, setShowStandings] = useState(false);
   const { pointFeedback, aceFeedback } = useTactile();
@@ -66,6 +79,7 @@ export function ScoreboardActive({ match, onAddPoint, onUndo, onReset, onNewMatc
         onNewMatch={onNewMatch}
         onBackToMenu={onBackToMenu}
         onRematchWithPair={onRematchWithPair}
+        onUndoLastPoint={onUndo}
       />
     );
   }
@@ -138,10 +152,11 @@ export function ScoreboardActive({ match, onAddPoint, onUndo, onReset, onNewMatc
         />
       </div>
       <ControlPanel
-        onReset={onReset}
+        onResetMatch={onResetMatch}
+        onResetSession={onResetSession}
+        onResetAll={onResetAll}
         onUndo={onUndo}
         canUndo={match.history.length > 0}
-        gameOver={!!match.result}
         onSwap={onSwapPlayers}
         onOpenStandings={() => setShowStandings(true)}
       />
