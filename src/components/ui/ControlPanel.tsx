@@ -13,6 +13,8 @@ interface ControlPanelProps {
   onSwap?: () => void;
   onOpenDisplay?: () => void;
   onOpenStandings?: () => void;
+  onOpenRemote?: () => void;
+  remoteActive?: boolean;
 }
 
 export function ControlPanel({
@@ -25,6 +27,8 @@ export function ControlPanel({
   onSwap,
   onOpenDisplay,
   onOpenStandings,
+  onOpenRemote,
+  remoteActive = false,
 }: ControlPanelProps) {
   const [showResetModal, setShowResetModal] = useState(false);
 
@@ -70,6 +74,17 @@ export function ControlPanel({
             className="shrink-0 whitespace-nowrap rounded bg-yellow-600 px-3 py-2 text-sm font-semibold text-white transition-all active:scale-95 hover:bg-yellow-700"
           >
             🏆 Tabla
+          </button>
+        )}
+
+        {onOpenRemote && (
+          <button
+            onClick={onOpenRemote}
+            className={`shrink-0 whitespace-nowrap rounded px-3 py-2 text-sm font-semibold text-white transition-all active:scale-95 ${
+              remoteActive ? 'bg-green-600 hover:bg-green-700' : 'bg-teal-600 hover:bg-teal-700'
+            }`}
+          >
+            {remoteActive ? '🎮 Control ✓' : '🎮 Control'}
           </button>
         )}
       </div>
