@@ -25,9 +25,11 @@ export function useRemoteChannel(opts: Options) {
   const channelRef = useRef<any>(null);
   const onActionRef = useRef<((a: RemoteAction) => void) | undefined>(undefined);
   const onStateRef = useRef<((s: RemoteState) => void) | undefined>(undefined);
+  const latestStateRef = useRef<RemoteState | null>(null);
 
   onActionRef.current = opts.role === 'board' ? opts.onAction : undefined;
   onStateRef.current = opts.role === 'remote' ? opts.onState : undefined;
+  if (opts.role === 'board') latestStateRef.current = opts.state ?? null;
 
   const { role, roomCode } = opts;
 
@@ -49,6 +51,12 @@ export function useRemoteChannel(opts: Options) {
       channel.on('presence', { event: 'sync' }, () => {
         const others = Object.keys(channel.presenceState()).filter((k) => k !== 'board');
         setPeerConnected(others.length > 0);
+      });
+      channel.on('presence', { event: 'join' }, () => {
+        // A remote just connected — send it the current state right away.
+        if (latestStateRef.current) {
+          channel.send({ type: 'broadcast', event: 'state', payload: latestStateRef.current });
+        }
       });
     } else {
       channel.on('broadcast', { event: 'state' }, ({ payload }: any) => {
