@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import type { PlayerInfo } from '@/types';
-import { getRecentPairs, type RecentPair } from '@/lib/recentPairs';
+import { getRecentPairs, RECENT_PAIRS_SHOWN, type RecentPair } from '@/lib/recentPairs';
 
 const DEFAULT_PLAYERS = [
   { id: '1', name: 'Ernesto', color: '#3b82f6', isFrequent: true },
@@ -39,7 +39,7 @@ export function PlayerSelector({ onSelectPlayers }: PlayerSelectorProps) {
   const [recentPairs, setRecentPairs] = useState<RecentPair[]>([]);
 
   useEffect(() => {
-    setRecentPairs(getRecentPairs());
+    setRecentPairs(getRecentPairs().slice(0, RECENT_PAIRS_SHOWN));
   }, []);
 
   const handleQuickSelect = (pair: RecentPair) => {

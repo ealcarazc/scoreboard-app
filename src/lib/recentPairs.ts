@@ -7,7 +7,10 @@ export interface RecentPair {
 }
 
 const KEY = 'recentPairs';
-const MAX = 3;
+// Keep a deeper bench than we show, so after filtering out the current
+// pair / churn there are still 3 fresh ones to offer.
+const MAX = 6;
+export const RECENT_PAIRS_SHOWN = 3;
 
 export function getRecentPairs(): RecentPair[] {
   if (typeof window === 'undefined') return [];

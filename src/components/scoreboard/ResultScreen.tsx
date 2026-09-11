@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import type { Match, PlayerInfo } from '@/types';
 import { recordMatchResult, revertMatchResult, type SessionStats } from '@/lib/sessionStats';
-import { getRecentPairs, type RecentPair } from '@/lib/recentPairs';
+import { getRecentPairs, RECENT_PAIRS_SHOWN, type RecentPair } from '@/lib/recentPairs';
 import { recordSeriesResult, revertSeriesResult, type SeriesResult } from '@/lib/seriesTracker';
 import { addMatchHistoryEntry, removeLastMatchHistoryEntry } from '@/lib/matchHistory';
 import { pushToDrive } from '@/lib/driveSync';
@@ -57,7 +57,9 @@ export function ResultScreen({ match, onNewMatch, onBackToMenu, onRematchWithPai
     const pairKey = (a: string, b: string) => [a, b].sort().join('|');
     const currentKey = pairKey(match.players.p1.name, match.players.p2.name);
     setRecentPairs(
-      getRecentPairs().filter((p) => pairKey(p.player1.name, p.player2.name) !== currentKey)
+      getRecentPairs()
+        .filter((p) => pairKey(p.player1.name, p.player2.name) !== currentKey)
+        .slice(0, RECENT_PAIRS_SHOWN)
     );
   }, [match.players.p1.name, match.players.p2.name]);
 
