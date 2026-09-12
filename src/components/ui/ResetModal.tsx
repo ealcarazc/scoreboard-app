@@ -18,7 +18,7 @@ const LEVEL_INFO: Record<Level, { title: string; desc: string }> = {
   session: { title: 'Reset de sesión', desc: 'Borra el marcador actual y la tabla de victorias de la sesión.' },
   all: {
     title: 'Reset completo',
-    desc: 'Borra todo: marcador, sesión, jugadores frecuentes, historial y serie en curso.',
+    desc: 'Borra marcador, sesión, historial y serie en curso. Las parejas recientes no se borran.',
   },
 };
 
@@ -95,7 +95,7 @@ export function ResetModal({
                 className="w-full rounded-lg bg-red-900/50 px-4 py-3 text-left transition-all hover:bg-red-900/70 active:scale-[0.98]"
               >
                 <p className="font-semibold">Reset completo</p>
-                <p className="text-xs text-gray-300">Todo: marcador, sesión, jugadores, historial y serie</p>
+                <p className="text-xs text-gray-300">Marcador, sesión, historial y serie (no las parejas)</p>
               </button>
             </div>
             <button

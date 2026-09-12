@@ -1,7 +1,12 @@
 // Shared types + helpers for the phone-as-remote feature.
-// The iPad runs the real scoreboard (the "board"); the phone runs a dumb
-// "remote" that only sends actions. They talk over a Supabase Realtime
-// broadcast channel keyed by a short room code.
+// Every device that opens /r/{code} is a peer: it shows the exact same
+// big scoreboard (via ScoreDisplay) and can tap to score. Whichever
+// device actually created the match keeps running the game engine and
+// broadcasts the resulting state; every peer (including that device)
+// renders from a single Supabase Realtime broadcast channel keyed by a
+// short room code.
+
+import type { Sport } from '@/types';
 
 export type RemoteAction =
   | { type: 'point'; player: 'p1' | 'p2' }
@@ -9,6 +14,7 @@ export type RemoteAction =
   | { type: 'undo' };
 
 export interface RemoteState {
+  sport: Sport;
   p1Name: string;
   p2Name: string;
   p1Color: string;
@@ -16,6 +22,12 @@ export interface RemoteState {
   p1Score: number | string;
   p2Score: number | string;
   subtitle: string;
+  p1Serving: boolean;
+  p2Serving: boolean;
+  p1MatchPoint: boolean;
+  p2MatchPoint: boolean;
+  p1SessionLeader: boolean;
+  p2SessionLeader: boolean;
   matchOver: boolean;
   winnerName: string | null;
 }

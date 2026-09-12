@@ -5,7 +5,7 @@ import { SportSelector } from '@/components/ui/SportSelector';
 import { PlayerSelector } from '@/components/ui/PlayerSelector';
 import { ScoreboardActive } from '@/components/scoreboard/ScoreboardActive';
 import { useMatch } from '@/lib/hooks/useMatch';
-import { saveRecentPair, clearRecentPairs } from '@/lib/recentPairs';
+import { saveRecentPair } from '@/lib/recentPairs';
 import { resetSessionStats } from '@/lib/sessionStats';
 import { clearSeriesState } from '@/lib/seriesTracker';
 import { clearMatchHistory } from '@/lib/matchHistory';
@@ -81,7 +81,8 @@ export default function Home() {
   const handleResetAll = () => {
     resetMatch();
     resetSessionStats();
-    clearRecentPairs();
+    // Recent pairs are a convenience shortcut, not "data" — they survive
+    // every reset level so quick-select keeps working after a cleanup.
     clearSeriesState();
     clearMatchHistory();
     localStorage.removeItem('lastSport');

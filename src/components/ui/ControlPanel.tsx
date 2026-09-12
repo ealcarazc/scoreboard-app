@@ -84,7 +84,7 @@ export function ControlPanel({
               remoteActive ? 'bg-green-600 hover:bg-green-700' : 'bg-teal-600 hover:bg-teal-700'
             }`}
           >
-            {remoteActive ? '🎮 Control ✓' : '🎮 Control'}
+            {remoteActive ? '🔗 Vincular ✓' : '🔗 Vincular'}
           </button>
         )}
       </div>

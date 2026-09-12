@@ -23,9 +23,9 @@ export function RemotePairing({ isOpen, onClose, roomCode, connected, peerConnec
         className="w-full max-w-sm rounded-2xl bg-white p-6 text-center text-gray-900"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="mb-1 text-xl font-bold">Control remoto</h2>
+        <h2 className="mb-1 text-xl font-bold">Vincular otro dispositivo</h2>
         <p className="mb-4 text-sm text-gray-500">
-          Escanea con el teléfono para anotar a distancia
+          Escanéalo desde el iPad o el teléfono — se ve el mismo marcador grande y también se puede anotar ahí
         </p>
 
         <div className="mx-auto mb-4 w-fit rounded-xl bg-white p-3 ring-1 ring-gray-200">

@@ -102,8 +102,13 @@ export function ScoreboardActive({
   );
 
   const { p1Score, p2Score, subtitle } = formatScores(match);
+  const p1Serving = match.currentServer === 'p1';
+  const p2Serving = match.currentServer === 'p2';
+  const p1MatchPoint = isMatchPoint(match, 'p1');
+  const p2MatchPoint = isMatchPoint(match, 'p2');
 
   const remoteState: RemoteState = {
+    sport: match.sport,
     p1Name: match.players.p1.name,
     p2Name: match.players.p2.name,
     p1Color: match.players.p1.color,
@@ -111,6 +116,12 @@ export function ScoreboardActive({
     p1Score,
     p2Score,
     subtitle,
+    p1Serving,
+    p2Serving,
+    p1MatchPoint,
+    p2MatchPoint,
+    p1SessionLeader: leaders.includes(match.players.p1.name),
+    p2SessionLeader: leaders.includes(match.players.p2.name),
     matchOver: !!match.result,
     winnerName: match.result
       ? match.result === 'p1_win'
@@ -166,11 +177,6 @@ export function ScoreboardActive({
       </>
     );
   }
-
-  const p1Serving = match.currentServer === 'p1';
-  const p2Serving = match.currentServer === 'p2';
-  const p1MatchPoint = isMatchPoint(match, 'p1');
-  const p2MatchPoint = isMatchPoint(match, 'p2');
 
   const tennisSubtitle = match.sport === 'tennis' ? subtitle : '';
 
