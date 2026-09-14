@@ -97,8 +97,14 @@ export default function Home() {
     return <SportSelector onSelectSport={handleSelectSport} />;
   }
 
-  if (appState === 'player-select') {
-    return <PlayerSelector onSelectPlayers={handleSelectPlayers} />;
+  if (appState === 'player-select' && selectedSport) {
+    return (
+      <PlayerSelector
+        sport={selectedSport}
+        onSelectPlayers={handleSelectPlayers}
+        onBack={() => setAppState('sport-select')}
+      />
+    );
   }
 
   if (!match) {

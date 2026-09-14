@@ -22,6 +22,16 @@ const LEVEL_INFO: Record<Level, { title: string; desc: string }> = {
   },
 };
 
+const font = 'var(--font-geist-sans), sans-serif';
+
+const optionButtonStyle: React.CSSProperties = {
+  width: '100%',
+  textAlign: 'left',
+  borderRadius: '16px',
+  padding: '14px 16px',
+  fontFamily: font,
+};
+
 export function ResetModal({
   isOpen,
   onClose,
@@ -59,71 +69,118 @@ export function ResetModal({
       onClick={handleClose}
     >
       <div
-        className="w-full max-w-md rounded-t-2xl bg-gray-800 p-5 text-white sm:rounded-2xl"
+        className="w-full max-w-md text-white sm:rounded-[24px]"
+        style={{
+          backgroundColor: '#171717',
+          borderRadius: '24px 24px 0 0',
+          padding: '28px 24px',
+        }}
         onClick={(e) => e.stopPropagation()}
       >
         {pending === null ? (
           <>
-            <h2 className="mb-4 text-center text-lg font-bold">Reset</h2>
+            <h2
+              className="mb-5 text-center"
+              style={{ fontFamily: font, fontWeight: 700, fontSize: '20px' }}
+            >
+              Reset
+            </h2>
             <div className="space-y-2">
               <button
                 onClick={handleExit}
-                className="w-full rounded-lg bg-blue-900/50 px-4 py-3 text-left transition-all hover:bg-blue-900/70 active:scale-[0.98]"
+                className="transition-all active:scale-[0.98]"
+                style={{ ...optionButtonStyle, backgroundColor: 'rgba(37,99,235,0.18)' }}
               >
-                <p className="font-semibold">🚪 Salir al menú</p>
-                <p className="text-xs text-blue-200">No borra nada — solo sales del partido actual</p>
+                <p style={{ fontWeight: 700, fontSize: '15px' }}>🚪 Salir al menú</p>
+                <p style={{ fontSize: '12px', color: '#93C5FD', marginTop: '2px' }}>
+                  No borra nada — solo sales del partido actual
+                </p>
               </button>
 
-              <div className="my-3 border-t border-gray-700" />
+              <div className="my-3" style={{ borderTop: '1px solid #2A2A2A' }} />
 
               <button
                 onClick={() => setPending('match')}
-                className="w-full rounded-lg bg-gray-700 px-4 py-3 text-left transition-all hover:bg-gray-600 active:scale-[0.98]"
+                className="transition-all active:scale-[0.98]"
+                style={{ ...optionButtonStyle, backgroundColor: '#232323' }}
               >
-                <p className="font-semibold">Reset de partido</p>
-                <p className="text-xs text-gray-400">Solo el marcador actual</p>
+                <p style={{ fontWeight: 700, fontSize: '15px' }}>Reset de partido</p>
+                <p style={{ fontSize: '12px', color: '#9B9B98', marginTop: '2px' }}>Solo el marcador actual</p>
               </button>
               <button
                 onClick={() => setPending('session')}
-                className="w-full rounded-lg bg-gray-700 px-4 py-3 text-left transition-all hover:bg-gray-600 active:scale-[0.98]"
+                className="transition-all active:scale-[0.98]"
+                style={{ ...optionButtonStyle, backgroundColor: '#232323', marginTop: '8px' }}
               >
-                <p className="font-semibold">Reset de sesión</p>
-                <p className="text-xs text-gray-400">Marcador + tabla de victorias</p>
+                <p style={{ fontWeight: 700, fontSize: '15px' }}>Reset de sesión</p>
+                <p style={{ fontSize: '12px', color: '#9B9B98', marginTop: '2px' }}>Marcador + tabla de victorias</p>
               </button>
               <button
                 onClick={() => setPending('all')}
-                className="w-full rounded-lg bg-red-900/50 px-4 py-3 text-left transition-all hover:bg-red-900/70 active:scale-[0.98]"
+                className="transition-all active:scale-[0.98]"
+                style={{ ...optionButtonStyle, backgroundColor: 'rgba(239,68,68,0.18)', marginTop: '8px' }}
               >
-                <p className="font-semibold">Reset completo</p>
-                <p className="text-xs text-gray-300">Marcador, sesión, historial y serie (no las parejas)</p>
+                <p style={{ fontWeight: 700, fontSize: '15px' }}>Reset completo</p>
+                <p style={{ fontSize: '12px', color: '#FCA5A5', marginTop: '2px' }}>
+                  Marcador, sesión, historial y serie (no las parejas)
+                </p>
               </button>
             </div>
             <button
               onClick={handleClose}
-              className="mt-4 w-full rounded-lg bg-gray-700 px-4 py-3 font-semibold transition-all hover:bg-gray-600 active:scale-[0.98]"
+              className="mt-4 w-full transition-all active:scale-[0.98]"
+              style={{
+                backgroundColor: '#2E2E2E',
+                borderRadius: '9999px',
+                padding: '14px',
+                fontFamily: font,
+                fontWeight: 700,
+                fontSize: '15px',
+              }}
             >
               Cancelar
             </button>
           </>
         ) : (
-          <>
-            <h2 className="mb-2 text-center text-lg font-bold">{LEVEL_INFO[pending].title}</h2>
-            <p className="mb-5 text-center text-sm text-gray-300">¿Seguro? {LEVEL_INFO[pending].desc}</p>
-            <div className="flex gap-3">
+          <div className="text-center">
+            <div style={{ fontSize: '36px', marginBottom: '10px' }}>⚠️</div>
+            <h2 className="mb-2" style={{ fontFamily: font, fontWeight: 700, fontSize: '22px' }}>
+              {LEVEL_INFO[pending].title}
+            </h2>
+            <p className="mb-6" style={{ fontFamily: font, fontSize: '15px', color: '#B5B5B3' }}>
+              {LEVEL_INFO[pending].desc}
+            </p>
+            <div className="flex" style={{ gap: '10px' }}>
               <button
                 onClick={() => setPending(null)}
-                className="flex-1 rounded-lg bg-gray-700 px-4 py-3 font-semibold transition-all hover:bg-gray-600 active:scale-[0.98]"
+                className="flex-1 transition-all active:scale-[0.98]"
+                style={{
+                  backgroundColor: '#2E2E2E',
+                  borderRadius: '9999px',
+                  padding: '14px',
+                  fontFamily: font,
+                  fontWeight: 700,
+                  fontSize: '16px',
+                }}
               >
                 Cancelar
               </button>
               <button
                 onClick={handleConfirm}
-                className="flex-1 rounded-lg bg-red-600 px-4 py-3 font-semibold transition-all hover:bg-red-700 active:scale-[0.98]"
+                className="flex-1 transition-all active:scale-[0.98]"
+                style={{
+                  backgroundColor: '#ef4444',
+                  borderRadius: '9999px',
+                  padding: '14px',
+                  fontFamily: font,
+                  fontWeight: 700,
+                  fontSize: '16px',
+                }}
               >
                 Confirmar
               </button>
             </div>
-          </>
+          </div>
         )}
       </div>
     </div>

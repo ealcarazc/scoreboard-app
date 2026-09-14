@@ -36,29 +36,60 @@ export function SessionStandingsModal({ isOpen, onClose }: SessionStandingsModal
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 p-4">
-      <div className="w-full max-w-md rounded-lg bg-gray-800 p-6 text-white">
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-2xl font-bold">🏆 Tabla de Sesión</h2>
-          <button onClick={onClose} className="rounded bg-gray-700 px-3 py-1 hover:bg-gray-600">
+      <div
+        className="w-full max-w-md text-white"
+        style={{ backgroundColor: '#171717', borderRadius: '24px', padding: '28px 24px' }}
+      >
+        <div className="mb-5 flex items-center justify-between">
+          <h2
+            style={{
+              fontFamily: 'var(--font-instrument-serif), Newsreader, serif',
+              fontStyle: 'italic',
+              fontWeight: 400,
+              fontSize: '28px',
+            }}
+          >
+            🏆 Tabla de sesión
+          </h2>
+          <button
+            onClick={onClose}
+            className="transition-all active:scale-90"
+            style={{
+              backgroundColor: '#2E2E2E',
+              borderRadius: '9999px',
+              width: '32px',
+              height: '32px',
+              fontFamily: 'var(--font-geist-sans), sans-serif',
+            }}
+          >
             ✕
           </button>
         </div>
 
         {rows.length === 0 ? (
-          <p className="py-8 text-center text-gray-400">Aún no hay partidos ganados en esta sesión.</p>
+          <p className="py-8 text-center" style={{ color: '#B5B5B3', fontFamily: 'var(--font-geist-sans), sans-serif' }}>
+            Aún no hay partidos ganados en esta sesión.
+          </p>
         ) : (
           <div className="mb-6 space-y-2">
-            <div className="flex justify-between px-2 text-sm text-gray-400">
+            <div
+              className="flex justify-between px-2 text-sm"
+              style={{ color: '#9B9B98', fontFamily: 'var(--font-geist-sans), sans-serif' }}
+            >
               <span>Jugador</span>
               <span>Copas · Partidos</span>
             </div>
             {rows.map(([name, s], i) => (
-              <div key={name} className="flex items-center justify-between rounded bg-gray-700 px-4 py-3">
-                <span className="font-semibold">
+              <div
+                key={name}
+                className="flex items-center justify-between"
+                style={{ backgroundColor: '#232323', borderRadius: '16px', padding: '14px 16px' }}
+              >
+                <span style={{ fontFamily: 'var(--font-geist-sans), sans-serif', fontWeight: 600, fontSize: '15px' }}>
                   {i === 0 && s.wins > 0 && '🏆 '}
                   {name}
                 </span>
-                <span className="text-gray-300">
+                <span style={{ color: '#B5B5B3', fontFamily: 'var(--font-geist-sans), sans-serif', fontWeight: 700 }}>
                   {s.wins} · {s.matches}
                 </span>
               </div>
@@ -68,11 +99,17 @@ export function SessionStandingsModal({ isOpen, onClose }: SessionStandingsModal
 
         <button
           onClick={handleResetSession}
-          className={`w-full rounded px-4 py-3 font-semibold transition-all active:scale-95 ${
-            confirmReset ? 'bg-red-700' : 'bg-gray-700 hover:bg-gray-600'
-          }`}
+          className="w-full transition-all active:scale-[0.98]"
+          style={{
+            backgroundColor: confirmReset ? '#ef4444' : '#2E2E2E',
+            borderRadius: '9999px',
+            padding: '14px',
+            fontFamily: 'var(--font-geist-sans), sans-serif',
+            fontWeight: 700,
+            fontSize: '15px',
+          }}
         >
-          {confirmReset ? '¿Seguro? Toca de nuevo para borrar todo' : '🗑️ Reset de Sesión'}
+          {confirmReset ? '¿Seguro? Toca de nuevo para borrar todo' : '🗑️ Reset de sesión'}
         </button>
       </div>
     </div>
