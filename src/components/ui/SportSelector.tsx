@@ -74,7 +74,7 @@ export function SportSelector({ onSelectSport }: SportSelectorProps) {
           <h1
             className="mb-2 text-5xl md:text-6xl font-light"
             style={{
-              fontFamily: "'Instrument Serif', 'Newsreader', serif",
+              fontFamily: "var(--font-instrument-serif), 'Newsreader', serif",
               color: 'var(--sb-text)',
               letterSpacing: '-0.02em',
               lineHeight: '1.1',
@@ -111,7 +111,7 @@ export function SportSelector({ onSelectSport }: SportSelectorProps) {
                     className="text-sm font-semibold md:text-base"
                     style={{
                       color: isSelected ? '#FFFFFF' : 'var(--sb-text)',
-                      fontFamily: "'Geist Sans', sans-serif",
+                      fontFamily: "var(--font-geist-sans), sans-serif",
                     }}
                   >
                     {SPORT_NAME[sport.id]}
@@ -139,7 +139,7 @@ export function SportSelector({ onSelectSport }: SportSelectorProps) {
                     padding: '14px 28px',
                     borderRadius: '10px',
                     border: 'none',
-                    fontFamily: "'Geist Sans', sans-serif",
+                    fontFamily: "var(--font-geist-sans), sans-serif",
                     fontSize: '15px',
                     fontWeight: '600',
                     letterSpacing: '0.01em',
@@ -158,7 +158,7 @@ export function SportSelector({ onSelectSport }: SportSelectorProps) {
           <button
             onClick={() => setShowStandings(true)}
             className="text-sm transition-opacity hover:opacity-70"
-            style={{ color: 'var(--sb-text-secondary)', fontFamily: "'Geist Sans', sans-serif" }}
+            style={{ color: 'var(--sb-text-secondary)', fontFamily: "var(--font-geist-sans), sans-serif" }}
           >
             🏆 Tabla de sesión
           </button>
@@ -192,14 +192,6 @@ export function SportSelector({ onSelectSport }: SportSelectorProps) {
         @keyframes formatsIn {
           from { opacity: 0; transform: translateY(-8px); }
           to { opacity: 1; transform: translateY(0); }
-        }
-
-        @supports (font-variation-settings: normal) {
-          body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
-              'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans',
-              'Helvetica Neue', sans-serif;
-          }
         }
       `}</style>
     </div>
